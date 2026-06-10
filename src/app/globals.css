@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sk-50: #F0FDFA;
+  --color-sk-100: #CCFBF1;
+  --color-sk-200: #99F6E4;
+  --color-sk-300: #5EEAD4;
+  --color-sk-400: #2DD4BF;
+  --color-sk-500: #14B8A6;
+  --color-sk-600: #0D9488;
+  --color-sk-700: #0F766E;
+  --color-sk-800: #115E59;
+  --color-sk-900: #134E4A;
+  --color-sk-950: #0A2F2B;
+
+  --color-coral-50: #FFF1F0;
+  --color-coral-100: #FFE4E0;
+  --color-coral-200: #FFC9C2;
+  --color-coral-300: #FFA394;
+  --color-coral-400: #FF7A66;
+  --color-coral-500: #F05A44;
+  --color-coral-600: #D04C3A;
+  --color-coral-700: #AE3A2A;
+  --color-coral-800: #8F3124;
+  --color-coral-900: #772B21;
+
+  --color-mint-50: #ECFDF5;
+  --color-mint-100: #D1FAE5;
+  --color-mint-200: #A7F3D0;
+  --color-mint-300: #6EE7B7;
+  --color-mint-400: #34D399;
+  --color-mint-500: #10B981;
+  --color-mint-600: #059669;
+  --color-mint-700: #047857;
+
+  --color-amber-50: #FFFBEB;
+  --color-amber-100: #FEF3C7;
+  --color-amber-200: #FDE68A;
+  --color-amber-400: #FBBF24;
+  --color-amber-500: #F59E0B;
+
+  --color-warm-50: #FAF8F6;
+  --color-warm-100: #F3F0EC;
+  --color-warm-200: #E8E3DC;
+  --color-warm-300: #D4CDC3;
+  --color-warm-400: #B8AFA2;
+  --color-warm-500: #9C9285;
+  --color-warm-600: #80776B;
+  --color-warm-700: #696157;
+  --color-warm-800: #575049;
+  --color-warm-900: #4A443E;
+  --color-warm-950: #2C2824;
+
+  --font-display: 'Figtree', sans-serif;
+  --font-body: 'Noto Sans', sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-expo: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --animate-float: float 4s var(--ease-in-out-expo) infinite;
+  --animate-float-slow: float 6s var(--ease-in-out-expo) infinite;
+  --animate-float-delayed: float 5s var(--ease-in-out-expo) 1s infinite;
+  --animate-pulse-glow: pulse-glow 2.5s ease-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-spin-slow: spin 8s linear infinite;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-family: var(--font-body);
+    color: var(--color-warm-950);
+    background-color: var(--color-warm-50);
+    overflow-x: hidden;
+  }
+  a { text-decoration: none; color: inherit; }
+  ul, ol { list-style: none; padding: 0; margin: 0; }
+  button { cursor: pointer; font-family: inherit; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(208, 76, 58, 0.25); }
+  50% { box-shadow: 0 0 0 20px rgba(208, 76, 58, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.88); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: translateY(16px) scale(0.94);
+  transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .reveal-left { opacity: 1; transform: none; }
+  .reveal-right { opacity: 1; transform: none; }
+  .reveal-scale { opacity: 1; transform: none; }
+}
