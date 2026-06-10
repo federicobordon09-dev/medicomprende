@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { site } from "@/data/contenido";
@@ -12,6 +12,11 @@ export default function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollTo = useCallback((id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   return (
@@ -37,18 +42,18 @@ export default function Navbar() {
           </span>
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
-          <a
-            href="#como-funciona"
+          <button
+            onClick={() => scrollTo("como-funciona")}
             className="text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 flex items-center rounded-lg text-white/80 hover:text-white transition-colors"
           >
             Cómo funciona
-          </a>
-          <a
-            href="#faq"
+          </button>
+          <button
+            onClick={() => scrollTo("faq")}
             className="text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 flex items-center rounded-lg text-white/80 hover:text-white transition-colors"
           >
             FAQ
-          </a>
+          </button>
         </div>
       </div>
     </nav>
