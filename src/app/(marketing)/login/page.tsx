@@ -100,6 +100,117 @@ function TestimonialCard({ text, name, delay }: { text: string; name: string; de
   );
 }
 
+/* ── Forgot Password Modal ── */
+function ForgotPasswordModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Error al enviar la solicitud.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Error de conexión. Intentá de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
+      <motion.div
+        className="bg-white rounded-2xl shadow-xl border border-warm-200 p-6 sm:p-8 w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {!sent ? (
+          <>
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 rounded-xl bg-azul-100 flex items-center justify-center mx-auto mb-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-azul-600">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <h3 className="font-display font-bold text-lg text-warm-950">¿Olvidaste tu contraseña?</h3>
+              <p className="text-sm text-warm-500 mt-1">
+                Ingresá tu email y te enviaremos instrucciones para restablecerla.
+              </p>
+            </div>
+      <ForgotPasswordModal open={showForgot} onClose={() => setShowForgot(false)} />
+      <form id="login-form" onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="reset-email" className="block text-sm font-medium text-warm-700 mb-1.5">Email</label>
+                <input
+                  id="reset-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-white border border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500 transition-all text-sm"
+                  placeholder="tu@email.com"
+                  required
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-cta-500 hover:bg-cta-600 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 text-sm"
+              >
+                {loading ? "Enviando…" : "Enviar instrucciones"}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full text-sm text-warm-500 hover:text-warm-700 py-1 transition-colors"
+              >
+                Cancelar
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <div className="w-14 h-14 rounded-full bg-celeste-100 flex items-center justify-center mx-auto mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-celeste-600">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <h3 className="font-display font-bold text-lg text-warm-950 mb-2">Revisá tu email</h3>
+            <p className="text-sm text-warm-500 leading-relaxed">
+              Si existe una cuenta con <strong className="text-warm-700">{email}</strong>, recibirás instrucciones para restablecer tu contraseña.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-6 text-sm text-cta-500 hover:text-cta-600 font-medium transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
 /* ── Login form ── */
 function LoginForm() {
   const router = useRouter();
@@ -108,6 +219,7 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,7 +296,7 @@ function LoginForm() {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="password" className="block text-sm font-medium text-warm-700">Contraseña</label>
-            <button type="button" className="text-xs text-cta-500 hover:text-cta-600 font-medium transition-colors">
+            <button type="button" onClick={() => setShowForgot(true)} className="text-xs text-cta-500 hover:text-cta-600 font-medium transition-colors">
               ¿Olvidaste tu contraseña?
             </button>
           </div>
@@ -360,12 +472,12 @@ export default function LoginPage() {
             >
               Crear cuenta gratis
             </Link>
-            <Link
-              href="/login"
+            <button
+              onClick={() => document.getElementById("login-form")?.scrollIntoView({ behavior: "smooth" })}
               className="w-full sm:w-auto bg-white border border-warm-200 hover:border-warm-300 text-warm-700 font-medium px-8 py-3 rounded-xl transition-all active:scale-[0.98] text-sm text-center"
             >
               Ya tengo cuenta
-            </Link>
+            </button>
           </motion.div>
         </div>
       </section>
