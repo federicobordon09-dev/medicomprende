@@ -12,10 +12,10 @@ export default function SettingsPage() {
         <p className="text-warm-600 mt-1">Administrá tu cuenta y preferencias.</p>
       </div>
 
-      <div className="bg-white rounded-xl p-6 border border-sk-200/60 space-y-4">
+      <div className="bg-white rounded-xl p-6 border border-azul-200/60 space-y-4">
         <h3 className="font-display font-semibold text-lg">Tu cuenta</h3>
-        <div className="flex items-center gap-4 pb-4 border-b border-sk-100">
-          <div className="w-14 h-14 rounded-full bg-coral-500 flex items-center justify-center text-white text-xl font-bold">
+        <div className="flex items-center gap-4 pb-4 border-b border-azul-100">
+          <div className="w-14 h-14 rounded-full bg-cta-500 flex items-center justify-center text-white text-xl font-bold">
             {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
           <div>
@@ -27,16 +27,16 @@ export default function SettingsPage() {
         <div className="text-sm text-warm-600 space-y-2">
           <div className="flex justify-between py-2">
             <span>Plan actual</span>
-            <span className="font-medium text-mint-600 bg-mint-50 px-2 py-0.5 rounded-full text-xs">Gratuito</span>
+            <span className="font-medium text-celeste-600 bg-celeste-50 px-2 py-0.5 rounded-full text-xs">Gratuito</span>
           </div>
           <div className="flex justify-between py-2">
             <span>Próximo paso</span>
-            <span className="text-coral-500 font-medium">Próximamente: Plan Pro</span>
+            <span className="text-cta-500 font-medium">Próximamente: Plan Pro</span>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-6 border border-sk-200/60">
+      <div className="bg-white rounded-xl p-6 border border-azul-200/60">
         <h3 className="font-display font-semibold text-lg mb-4">Información legal</h3>
         <div className="space-y-3 text-sm text-warm-600">
           <p>

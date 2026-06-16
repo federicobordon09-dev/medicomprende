@@ -89,12 +89,12 @@ export default function ComparePage() {
               onClick={() => toggleStudy(study.id)}
               className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
                 isSelected
-                  ? "border-coral-500 bg-coral-50"
-                  : "border-sk-200 bg-white hover:border-sk-300"
+                  ? "border-cta-500 bg-cta-50"
+                  : "border-azul-200 bg-white hover:border-azul-300"
               }`}
             >
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                isSelected ? "border-coral-500 bg-coral-500" : "border-sk-300"
+                isSelected ? "border-cta-500 bg-cta-500" : "border-azul-300"
               }`}>
                 {isSelected && (
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
@@ -116,7 +116,7 @@ export default function ComparePage() {
         <button
           onClick={handleCompare}
           disabled={selectedIds.length < 2 || comparing}
-          className="bg-coral-500 hover:bg-coral-600 disabled:bg-sk-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all active:scale-[0.97]"
+          className="bg-cta-500 hover:bg-cta-600 disabled:bg-azul-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all active:scale-[0.97]"
         >
           {comparing ? "Comparando..." : "Comparar"}
         </button>

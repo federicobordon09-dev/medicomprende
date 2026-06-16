@@ -73,33 +73,37 @@ export default function AlertsPage() {
     if (unreadIds.length > 0) await markRead(unreadIds);
   };
 
+  const unreadCount = loading ? 0 : alerts.filter((a) => !a.acknowledged).length;
+
   if (!loading && alerts.length === 0) {
     return (
-      <EmptyState
-        icon="alert"
-        title="No hay alertas"
-        description="No se detectaron patrones preocupantes en tus estudios. Las alertas aparecen cuando hay cambios significativos."
-      />
+      <div className="page-enter">
+        <EmptyState
+          icon="alert"
+          title="No hay alertas"
+          description="No se detectaron patrones preocupantes en tus estudios. Las alertas aparecen cuando hay cambios significativos."
+        />
+      </div>
     );
   }
 
-  const unreadCount = alerts.filter((a) => !a.acknowledged).length;
-
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl text-warm-950">Alertas</h1>
-          <p className="text-warm-600 text-sm mt-1">
-            {unreadCount > 0
-              ? `Tenés ${unreadCount} alerta${unreadCount !== 1 ? "s" : ""} sin leer.`
-              : "No tenés alertas pendientes."}
-          </p>
+          {!loading && (
+            <p className="text-warm-600 text-sm mt-1">
+              {unreadCount > 0
+                ? `Tenés ${unreadCount} alerta${unreadCount !== 1 ? "s" : ""} sin leer.`
+                : "No tenés alertas pendientes."}
+            </p>
+          )}
         </div>
-        {unreadCount > 0 && (
+        {!loading && unreadCount > 0 && (
           <button
             onClick={markAllRead}
-            className="text-sm font-medium text-coral-500 hover:text-coral-600"
+            className="text-sm font-medium text-cta-500 hover:text-cta-600 transition-colors"
           >
             Marcar todas como leídas
           </button>
@@ -113,8 +117,8 @@ export default function AlertsPage() {
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               filter === f
-                ? "bg-sk-900 text-white"
-                : "bg-white text-warm-600 hover:bg-sk-100"
+                ? "bg-azul-900 text-white shadow-sm"
+                : "bg-white text-warm-600 hover:bg-azul-100 border border-warm-200"
             }`}
           >
             {f === "unread" ? "Sin leer" : f === "all" ? "Todas" : "Leídas"}
@@ -125,22 +129,23 @@ export default function AlertsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-5 animate-pulse">
-              <div className="h-5 w-48 bg-sk-200 rounded mb-2" />
-              <div className="h-4 w-full bg-sk-100 rounded" />
+            <div key={i} className="bg-white rounded-xl p-5 animate-pulse border border-azul-200/40">
+              <div className="h-5 w-48 bg-azul-200 rounded mb-2" />
+              <div className="h-4 w-full bg-azul-100 rounded" />
             </div>
           ))}
         </div>
       ) : (
         <div className="space-y-3">
-          {alerts.map((alert) => (
+          {alerts.map((alert, i) => (
             <div
               key={alert.id}
               className={`bg-white rounded-xl p-5 border transition-all ${
                 !alert.acknowledged
-                  ? "border-coral-200 shadow-sm"
-                  : "border-sk-200/60 opacity-60"
-              }`}
+                  ? "border-cta-200 shadow-sm"
+                  : "border-azul-200/60 opacity-60"
+              } card-hover`}
+              style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${i * 60}ms both` }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -161,7 +166,7 @@ export default function AlertsPage() {
                 {!alert.acknowledged && (
                   <button
                     onClick={() => markRead([alert.id])}
-                    className="flex-shrink-0 text-xs text-coral-500 hover:text-coral-600 font-medium"
+                    className="flex-shrink-0 text-xs text-cta-500 hover:text-cta-600 font-medium transition-colors"
                   >
                     Leída
                   </button>

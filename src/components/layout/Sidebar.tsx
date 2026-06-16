@@ -56,7 +56,7 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-sk-900 rounded-xl flex items-center justify-center text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-azul-900 rounded-xl flex items-center justify-center text-white"
         aria-label="Menú"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -64,7 +64,7 @@ export function Sidebar() {
         </svg>
       </button>
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sk-950 text-white flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-azul-950 text-white flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="p-5 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="font-display font-semibold text-lg">MediComprende</span>
@@ -81,7 +81,7 @@ export function Sidebar() {
                 onClick={() => setMobileOpen(false)}
                 className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-coral-500/20 text-coral-300"
+                    ? "bg-cta-500/20 text-cta-300"
                     : "text-white/60 hover:text-white hover:bg-white/10 nav-hover-lift"
                 }`}
               >
@@ -95,7 +95,7 @@ export function Sidebar() {
 
         <div className="p-4 border-t border-white/10">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-coral-500 flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-cta-500 flex items-center justify-center text-xs font-bold">
               {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
             </div>
             <div className="flex-1 min-w-0">

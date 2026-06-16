@@ -26,7 +26,7 @@ export default function DashboardClientLayout({
     <SessionProvider>
       <AuthGuard>
         <ToastProvider>
-          <div className="h-dvh bg-sk-50 flex overflow-hidden">
+          <div className="h-dvh bg-azul-50 flex overflow-hidden">
             <Sidebar />
             <div className="flex-1 flex flex-col min-w-0">
               <DashboardHeader />

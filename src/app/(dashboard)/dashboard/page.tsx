@@ -40,22 +40,22 @@ function useCountUp(target: number, duration = 1200, delay = 0) {
   return { count, ref };
 }
 
-function StatCard({ value, label, sublabel, color }: { value: number; label: string; sublabel?: string; color: "teal" | "amber" | "coral" }) {
+function StatCard({ value, label, sublabel, color }: { value: number; label: string; sublabel?: string; color: "teal" | "amber" | "cta" }) {
   const { count, ref } = useCountUp(value);
   const colors = {
-    teal: "bg-white border border-sk-200/60",
+    teal: "bg-white border border-azul-200/60",
     amber: "bg-amber-50 border border-amber-200",
-    coral: "bg-coral-50 border border-coral-200",
+    cta: "bg-cta-50 border border-cta-200",
   };
   const valueColors = {
-    teal: "text-sk-700",
+    teal: "text-azul-700",
     amber: "text-amber-700",
-    coral: "text-coral-700",
+    cta: "text-cta-700",
   };
   const labelColors = {
-    teal: "text-sk-500",
+    teal: "text-azul-500",
     amber: "text-amber-600",
-    coral: "text-coral-600",
+    cta: "text-cta-600",
   };
 
   const showValue = value > 0;
@@ -68,14 +68,14 @@ function StatCard({ value, label, sublabel, color }: { value: number; label: str
         </p>
       ) : (
         <div className="flex items-center gap-2 h-9">
-          <svg className="w-5 h-5 text-sk-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+          <svg className="w-5 h-5 text-azul-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" strokeLinecap="round" />
           </svg>
-          <span className="text-sm text-sk-400">Sin datos</span>
+          <span className="text-sm text-azul-400">Sin datos</span>
         </div>
       )}
       <p className={`text-sm mt-1 ${labelColors[color]}`}>{label}</p>
-      {sublabel && <p className="text-xs text-sk-400 mt-0.5">{sublabel}</p>}
+      {sublabel && <p className="text-xs text-azul-400 mt-0.5">{sublabel}</p>}
     </div>
   );
 }
@@ -151,7 +151,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-coral-50 border border-coral-200 rounded-xl px-4 py-3 text-sm text-coral-700">
+        <div className="bg-cta-50 border border-cta-200 rounded-xl px-4 py-3 text-sm text-cta-700">
           {error}
         </div>
       )}
@@ -170,7 +170,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard value={studies.length} label="Estudios guardados" color="teal" />
         <StatCard value={unreadAlerts} label="Alertas sin revisar" color="amber" />
-        <StatCard value={outOfRangeCount} label="Valores fuera de rango" color="coral" />
+        <StatCard value={outOfRangeCount} label="Valores fuera de rango" color="cta" />
       </div>
 
       <section className="space-y-3">
@@ -180,18 +180,18 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/dashboard/upload"
-            className="text-sm font-medium text-coral-500 hover:text-coral-600 transition-colors"
+            className="text-sm font-medium text-cta-500 hover:text-cta-600 transition-colors"
           >
             Agregar estudio
           </Link>
         </div>
 
         {studies.length >= 2 && (
-          <div className="bg-mint-50 border border-mint-200 rounded-xl p-4 flex items-center gap-3">
-            <svg className="w-5 h-5 text-mint-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+          <div className="bg-celeste-50 border border-celeste-200 rounded-xl p-4 flex items-center gap-3">
+            <svg className="w-5 h-5 text-celeste-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
               <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
             </svg>
-            <p className="text-sm text-mint-700 flex-1">
+            <p className="text-sm text-celeste-700 flex-1">
               Tenés estudios del mismo tipo. <Link href="/dashboard/compare" className="font-semibold underline">Comparalos ahora</Link> para ver tu evolución.
             </p>
           </div>
@@ -207,11 +207,11 @@ export default function DashboardPage() {
               <Link
                 key={study.id}
                 href={`/dashboard/studies/${study.id}`}
-                className="block bg-white rounded-xl border border-sk-200/60 p-5 card-hover"
+                className="block bg-white rounded-xl border border-azul-200/60 p-5 card-hover"
                 style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${i * 80}ms both` }}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sk-100 to-sk-200 flex items-center justify-center flex-shrink-0 text-sk-600">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-azul-100 to-azul-200 flex items-center justify-center flex-shrink-0 text-azul-600">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                       <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                       <polyline points="14 2 14 8 20 8" />
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {severityCount > 0 && (
-                      <span className="inline-flex items-center gap-1 bg-coral-100 text-coral-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-cta-100 text-cta-700 text-xs font-medium px-2.5 py-1 rounded-full">
                         {severityCount} alerta{severityCount !== 1 ? "s" : ""}
                       </span>
                     )}

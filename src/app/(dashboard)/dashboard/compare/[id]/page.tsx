@@ -33,7 +33,7 @@ export default function CompareResultPage() {
     return (
       <div className="text-center py-16">
         <p className="text-warm-600">{error || "Comparación no encontrada."}</p>
-        <button onClick={() => router.push("/dashboard/compare")} className="text-coral-500 font-medium mt-4">
+        <button onClick={() => router.push("/dashboard/compare")} className="text-cta-500 font-medium mt-4">
           Volver a comparar
         </button>
       </div>
@@ -42,9 +42,9 @@ export default function CompareResultPage() {
 
   const severityColor = (significance: string) => {
     switch (significance) {
-      case "mejora": return "text-mint-600 bg-mint-50";
+      case "mejora": return "text-celeste-600 bg-celeste-50";
       case "empeoramiento": return "text-red-600 bg-red-50";
-      default: return "text-warm-600 bg-sk-50";
+      default: return "text-warm-600 bg-azul-50";
     }
   };
 
@@ -60,8 +60,8 @@ export default function CompareResultPage() {
         </button>
       </div>
 
-      <div className="bg-gradient-to-br from-sk-800 to-sk-950 rounded-2xl p-6 md:p-8 shadow-lg">
-        <p className="text-sk-100 leading-relaxed">{data.summary}</p>
+      <div className="bg-gradient-to-br from-azul-800 to-azul-950 rounded-2xl p-6 md:p-8 shadow-lg">
+        <p className="text-azul-100 leading-relaxed">{data.summary}</p>
       </div>
 
       {data.changes.length > 0 && (
@@ -70,7 +70,7 @@ export default function CompareResultPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-sk-100">
+                <tr className="border-b border-azul-100">
                   <th className="text-left py-3 px-2 font-medium text-warm-500">Parámetro</th>
                   <th className="text-left py-3 px-2 font-medium text-warm-500">Valor previo</th>
                   <th className="text-left py-3 px-2 font-medium text-warm-500">Valor actual</th>
@@ -80,7 +80,7 @@ export default function CompareResultPage() {
               </thead>
               <tbody>
                 {data.changes.map((c, i) => (
-                  <tr key={i} className="border-b border-sk-50 hover:bg-sk-50/50">
+                  <tr key={i} className="border-b border-azul-50 hover:bg-azul-50/50">
                     <td className="py-3 px-2 font-medium text-warm-900">{c.parameter}</td>
                     <td className="py-3 px-2 text-warm-600">{c.previousValue}</td>
                     <td className="py-3 px-2 text-warm-900 font-medium">{c.currentValue}</td>
@@ -88,7 +88,7 @@ export default function CompareResultPage() {
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                         c.change === "aumentó" ? "bg-amber-100 text-amber-700"
                         : c.change === "disminuyó" ? "bg-blue-100 text-blue-700"
-                        : "bg-sk-100 text-sk-600"
+                        : "bg-azul-100 text-azul-600"
                       }`}>
                         {c.change === "aumentó" ? "↑" : c.change === "disminuyó" ? "↓" : "→"} {c.change}
                       </span>
@@ -113,8 +113,8 @@ export default function CompareResultPage() {
             {data.trends.map((t, i) => (
               <div key={i} className={`rounded-xl p-4 ${
                 t.trend === "empeorando" ? "bg-red-50 border border-red-200"
-                : t.trend === "mejorando" ? "bg-mint-50 border border-mint-200"
-                : "bg-sk-50 border border-sk-200"
+                : t.trend === "mejorando" ? "bg-celeste-50 border border-celeste-200"
+                : "bg-azul-50 border border-azul-200"
               }`}>
                 <div className="flex items-start justify-between">
                   <div>
@@ -125,8 +125,8 @@ export default function CompareResultPage() {
                   </div>
                   <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
                     t.trend === "empeorando" ? "bg-red-200 text-red-800"
-                    : t.trend === "mejorando" ? "bg-mint-200 text-mint-800"
-                    : "bg-sk-200 text-sk-700"
+                    : t.trend === "mejorando" ? "bg-celeste-200 text-celeste-800"
+                    : "bg-azul-200 text-azul-700"
                   }`}>
                     {t.trend === "empeorando" ? "📈 Empeorando" : t.trend === "mejorando" ? "📉 Mejorando" : "➡️ Estable"}
                   </span>
@@ -141,19 +141,19 @@ export default function CompareResultPage() {
       )}
 
       {data.overallAssessment && (
-        <div className="relative bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-mint-400">
+        <div className="relative bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-celeste-400">
           <h3 className="font-display font-semibold text-lg text-warm-950 mb-3">Evaluación general</h3>
           <p className="text-warm-700 leading-relaxed">{data.overallAssessment}</p>
         </div>
       )}
 
       {data.recommendations.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-coral-400">
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-cta-400">
           <h3 className="font-display font-semibold text-lg text-warm-950 mb-3">Recomendaciones</h3>
           <ul className="space-y-2">
             {data.recommendations.map((r, i) => (
               <li key={i} className="flex items-start gap-2 text-warm-700">
-                <span className="text-coral-500">💡</span>
+                <span className="text-cta-500">💡</span>
                 {r}
               </li>
             ))}

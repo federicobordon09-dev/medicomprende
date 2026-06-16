@@ -30,7 +30,7 @@ function StepIcon({ step, current }: { step: number; current: number }) {
 
   if (done) {
     return (
-      <div className="w-7 h-7 rounded-full bg-mint-500 flex items-center justify-center flex-shrink-0">
+      <div className="w-7 h-7 rounded-full bg-celeste-500 flex items-center justify-center flex-shrink-0">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
           <polyline points="20 6 9 17 4 12" />
         </svg>
@@ -40,7 +40,7 @@ function StepIcon({ step, current }: { step: number; current: number }) {
 
   if (active) {
     return (
-      <div className="w-7 h-7 rounded-full bg-coral-500 flex items-center justify-center flex-shrink-0 animate-pulse">
+      <div className="w-7 h-7 rounded-full bg-cta-500 flex items-center justify-center flex-shrink-0 animate-pulse">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
           <circle cx="12" cy="12" r="10" />
         </svg>
@@ -49,7 +49,7 @@ function StepIcon({ step, current }: { step: number; current: number }) {
   }
 
   return (
-    <div className="w-7 h-7 rounded-full bg-sk-200 flex items-center justify-center flex-shrink-0">
+    <div className="w-7 h-7 rounded-full bg-azul-200 flex items-center justify-center flex-shrink-0">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
         <circle cx="12" cy="12" r="10" />
       </svg>
@@ -69,7 +69,7 @@ function LoadingOverlay() {
   return (
     <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center px-6 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex flex-col items-center gap-3 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-coral-100 flex items-center justify-center animate-pulse-glow">
+        <div className="w-16 h-16 rounded-2xl bg-cta-100 flex items-center justify-center animate-pulse-glow">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D04C3A" strokeWidth="1.5" strokeLinecap="round">
             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
             <polyline points="14 2 14 8 20 8" />
@@ -99,11 +99,11 @@ function LoadingOverlay() {
             </span>
             {i === step && (
               <div className="ml-auto">
-                <div className="w-4 h-4 rounded-full border-2 border-coral-500 border-t-transparent animate-spin" />
+                <div className="w-4 h-4 rounded-full border-2 border-cta-500 border-t-transparent animate-spin" />
               </div>
             )}
             {i < step && (
-              <span className="ml-auto text-mint-600">
+              <span className="ml-auto text-celeste-600">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
@@ -113,9 +113,9 @@ function LoadingOverlay() {
         ))}
       </div>
 
-      <div className="w-full max-w-sm mt-5 h-1.5 bg-sk-100 rounded-full overflow-hidden">
+      <div className="w-full max-w-sm mt-5 h-1.5 bg-azul-100 rounded-full overflow-hidden">
         <div
-          className="h-full bg-coral-500 rounded-full transition-all duration-700 ease-out"
+          className="h-full bg-cta-500 rounded-full transition-all duration-700 ease-out"
           style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
         />
       </div>
@@ -214,7 +214,7 @@ export default function UploadPage() {
         </div>
       )}
 
-      <div className="relative bg-white rounded-xl border border-sk-200/60 p-5 space-y-4">
+      <div className="relative bg-white rounded-xl border border-azul-200/60 p-5 space-y-4">
         {loading && <LoadingOverlay />}
 
         <div>
@@ -222,7 +222,7 @@ export default function UploadPage() {
           <select
             value={studyType}
             onChange={(e) => setStudyType(e.target.value as StudyType)}
-            className="w-full px-3.5 py-2 bg-white border border-sk-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-coral-500/30 focus:border-coral-500"
+            className="w-full px-3.5 py-2 bg-white border border-azul-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500"
           >
             {STUDY_TYPES.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
@@ -237,7 +237,7 @@ export default function UploadPage() {
               type="date"
               value={studyDate}
               onChange={(e) => setStudyDate(e.target.value)}
-              className="w-full px-3.5 py-2 bg-white border border-sk-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-coral-500/30 focus:border-coral-500"
+              className="w-full px-3.5 py-2 bg-white border border-azul-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500"
             />
           </div>
           {profiles.length > 0 && (
@@ -246,7 +246,7 @@ export default function UploadPage() {
               <select
                 value={selectedProfile}
                 onChange={(e) => setSelectedProfile(e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-sk-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-coral-500/30 focus:border-coral-500"
+                className="w-full px-3.5 py-2 bg-white border border-azul-200 rounded-xl text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500"
               >
                 <option value="">Para mí</option>
                 {profiles.map((p) => (
@@ -264,7 +264,7 @@ export default function UploadPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Ej: Análisis de sangre marzo 2026"
-            className="w-full px-3.5 py-2 bg-white border border-sk-200 rounded-xl text-warm-900 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-coral-500/30 focus:border-coral-500"
+            className="w-full px-3.5 py-2 bg-white border border-azul-200 rounded-xl text-warm-900 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500"
           />
         </div>
 
@@ -287,8 +287,8 @@ export default function UploadPage() {
               onDragLeave={() => setDragOver(false)}
               className={`w-full border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                 dragOver
-                  ? "border-coral-400 bg-coral-50"
-                  : "border-sk-300 bg-sk-50 hover:bg-sk-100 hover:border-sk-400"
+                  ? "border-cta-400 bg-cta-50"
+                  : "border-azul-300 bg-azul-50 hover:bg-azul-100 hover:border-azul-400"
               }`}
             >
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" className="mx-auto mb-2">
@@ -300,9 +300,9 @@ export default function UploadPage() {
               <p className="text-xs text-warm-500 mt-0.5">PDF, PNG, JPG o WEBP · máx 15 MB</p>
             </button>
           ) : (
-            <div className="bg-sk-50 rounded-xl p-4 border border-sk-200">
+            <div className="bg-azul-50 rounded-xl p-4 border border-azul-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-coral-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-cta-100 flex items-center justify-center flex-shrink-0">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D04C3A" strokeWidth="1.5" strokeLinecap="round">
                     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                     <polyline points="14 2 14 8 20 8" />
@@ -314,7 +314,7 @@ export default function UploadPage() {
                 </div>
                 <button
                   onClick={() => setFile(null)}
-                  className="w-8 h-8 rounded-full bg-white border border-sk-200 flex items-center justify-center text-warm-400 hover:text-warm-600 transition-all flex-shrink-0"
+                  className="w-8 h-8 rounded-full bg-white border border-azul-200 flex items-center justify-center text-warm-400 hover:text-warm-600 transition-all flex-shrink-0"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -328,7 +328,7 @@ export default function UploadPage() {
         <button
           onClick={handleSubmit}
           disabled={!file || loading}
-          className="w-full bg-coral-500 hover:bg-coral-600 disabled:bg-sk-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-sm transition-all active:scale-[0.97]"
+          className="w-full bg-cta-500 hover:bg-cta-600 disabled:bg-azul-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-sm transition-all active:scale-[0.97]"
         >
           {loading ? "Procesando..." : "Analizar informe"}
         </button>
