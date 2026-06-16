@@ -2,7 +2,7 @@ import { footer } from "@/data/contenido";
 
 export default function Footer() {
   return (
-    <footer className="bg-sk-950 text-sk-300 py-16 px-6">
+    <footer className="bg-azul-950 text-azul-300 py-16 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
           <div className="text-center md:text-left">

@@ -1,44 +1,82 @@
 @import "tailwindcss";
 
 @theme {
-  --color-sk-50: #F0FDFA;
-  --color-sk-100: #CCFBF1;
-  --color-sk-200: #99F6E4;
-  --color-sk-300: #5EEAD4;
-  --color-sk-400: #2DD4BF;
-  --color-sk-500: #14B8A6;
-  --color-sk-600: #0D9488;
-  --color-sk-700: #0F766E;
-  --color-sk-800: #115E59;
-  --color-sk-900: #134E4A;
-  --color-sk-950: #0A2F2B;
+  /* Azul (blue) — primary UI palette, replaces old sk (teal) */
+  --color-azul-50: #EFF6FF;
+  --color-azul-100: #DBEAFE;
+  --color-azul-200: #BFDBFE;
+  --color-azul-300: #93C5FD;
+  --color-azul-400: #60A5FA;
+  --color-azul-500: #3B82F6;
+  --color-azul-600: #2563EB;
+  --color-azul-700: #1D4ED8;
+  --color-azul-800: #1E40AF;
+  --color-azul-900: #1E3A8A;
+  --color-azul-950: #172554;
 
-  --color-coral-50: #FFF1F0;
-  --color-coral-100: #FFE4E0;
-  --color-coral-200: #FFC9C2;
-  --color-coral-300: #FFA394;
-  --color-coral-400: #FF7A66;
-  --color-coral-500: #F05A44;
-  --color-coral-600: #D04C3A;
-  --color-coral-700: #AE3A2A;
-  --color-coral-800: #8F3124;
-  --color-coral-900: #772B21;
+  /* Celeste (light blue) — accent, replaces old mint (green) */
+  --color-celeste-50: #F0F9FF;
+  --color-celeste-100: #E0F2FE;
+  --color-celeste-200: #BAE6FD;
+  --color-celeste-300: #7DD3FC;
+  --color-celeste-400: #38BDF8;
+  --color-celeste-500: #0EA5E9;
+  --color-celeste-600: #0284C7;
+  --color-celeste-700: #0369A1;
 
-  --color-mint-50: #ECFDF5;
-  --color-mint-100: #D1FAE5;
-  --color-mint-200: #A7F3D0;
-  --color-mint-300: #6EE7B7;
-  --color-mint-400: #34D399;
-  --color-mint-500: #10B981;
-  --color-mint-600: #059669;
-  --color-mint-700: #047857;
+  /* CTA accent — vibrant blue for buttons & links */
+  --color-cta-50: #EEF2FF;
+  --color-cta-100: #E0E7FF;
+  --color-cta-200: #C7D2FE;
+  --color-cta-300: #A5B4FC;
+  --color-cta-400: #818CF8;
+  --color-cta-500: #4F46E5;
+  --color-cta-600: #4338CA;
+  --color-cta-700: #3730A3;
+  --color-cta-800: #2E297A;
+  --color-cta-900: #25205C;
 
+  /* Legacy aliases for backward compatibility during migration */
+  --color-sk-50: var(--color-azul-50);
+  --color-sk-100: var(--color-azul-100);
+  --color-sk-200: var(--color-azul-200);
+  --color-sk-300: var(--color-azul-300);
+  --color-sk-400: var(--color-azul-400);
+  --color-sk-500: var(--color-azul-500);
+  --color-sk-600: var(--color-azul-600);
+  --color-sk-700: var(--color-azul-700);
+  --color-sk-800: var(--color-azul-800);
+  --color-sk-900: var(--color-azul-900);
+  --color-sk-950: var(--color-azul-950);
+
+  --color-coral-50: var(--color-cta-50);
+  --color-coral-100: var(--color-cta-100);
+  --color-coral-200: var(--color-cta-200);
+  --color-coral-300: var(--color-cta-300);
+  --color-coral-400: var(--color-cta-400);
+  --color-coral-500: var(--color-cta-500);
+  --color-coral-600: var(--color-cta-600);
+  --color-coral-700: var(--color-cta-700);
+  --color-coral-800: var(--color-cta-800);
+  --color-coral-900: var(--color-cta-900);
+
+  --color-mint-50: var(--color-celeste-50);
+  --color-mint-100: var(--color-celeste-100);
+  --color-mint-200: var(--color-celeste-200);
+  --color-mint-300: var(--color-celeste-300);
+  --color-mint-400: var(--color-celeste-400);
+  --color-mint-500: var(--color-celeste-500);
+  --color-mint-600: var(--color-celeste-600);
+  --color-mint-700: var(--color-celeste-700);
+
+  /* Amber (warnings, alerts) */
   --color-amber-50: #FFFBEB;
   --color-amber-100: #FEF3C7;
   --color-amber-200: #FDE68A;
   --color-amber-400: #FBBF24;
   --color-amber-500: #F59E0B;
 
+  /* Warm (neutral) — untouched */
   --color-warm-50: #FAF8F6;
   --color-warm-100: #F3F0EC;
   --color-warm-200: #E8E3DC;
@@ -92,8 +130,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(208, 76, 58, 0.25); }
-  50% { box-shadow: 0 0 0 20px rgba(208, 76, 58, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.25); }
+  50% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
 }
 
 @keyframes shimmer {
@@ -211,7 +249,7 @@
 .sidebar-indicator {
   width: 3px;
   height: 24px;
-  background: linear-gradient(180deg, var(--color-coral-400), var(--color-coral-500));
+  background: linear-gradient(180deg, var(--color-cta-400), var(--color-cta-500));
   border-radius: 0 4px 4px 0;
   transform: scaleY(0);
   transform-origin: center;

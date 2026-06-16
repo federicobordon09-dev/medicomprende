@@ -9,7 +9,8 @@ import { site } from "@/data/contenido";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isInternal = pathname.startsWith("/dashboard") || pathname.startsWith("/login") || pathname.startsWith("/register");
+  const isInternal = pathname.startsWith("/dashboard") || pathname.startsWith("/register");
+  const isLoginPage = pathname === "/login";
   const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,9 +34,9 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-500 ${
         isInternal
-          ? "bg-sk-950 shadow-lg"
+          ? "bg-azul-950 shadow-lg"
           : scrolled
-            ? "bg-sk-950/95 backdrop-blur-md shadow-lg"
+            ? "bg-azul-950/95 backdrop-blur-md shadow-lg"
             : "bg-transparent"
       }`}
       aria-label="Navegación principal"
@@ -78,7 +79,7 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 ml-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-coral-500 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-cta-500 flex items-center justify-center text-white text-xs font-bold">
                   {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -88,29 +89,29 @@ export default function Navbar() {
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-sk-100 z-50 overflow-hidden">
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/dashboard/upload"
-                      onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
-                    >
-                      Subir estudio
-                    </Link>
-                    <Link
-                      href="/dashboard/settings"
-                      onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
-                    >
-                      Configuración
-                    </Link>
-                    <hr className="border-sk-100" />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-azul-100 z-50 overflow-hidden">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-warm-700 hover:bg-azul-50"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/upload"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-warm-700 hover:bg-azul-50"
+                      >
+                        Subir estudio
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-warm-700 hover:bg-azul-50"
+                      >
+                        Configuración
+                      </Link>
+                      <hr className="border-azul-100" />
                     <button
                       onClick={() => { setMenuOpen(false); handleSignOut(); }}
                       className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
@@ -121,14 +122,14 @@ export default function Navbar() {
                 </>
               )}
             </div>
-          ) : (
+          ) : !isLoginPage ? (
             <Link
               href="/login"
-              className="text-xs sm:text-sm font-semibold px-4 py-2.5 min-h-11 flex items-center rounded-xl bg-coral-500 hover:bg-coral-600 text-white transition-all active:scale-[0.97] ml-2"
+              className="text-xs sm:text-sm font-semibold px-4 py-2.5 min-h-11 flex items-center rounded-xl bg-cta-500 hover:bg-cta-600 text-white transition-all active:scale-[0.97] ml-2"
             >
               Iniciar sesión
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

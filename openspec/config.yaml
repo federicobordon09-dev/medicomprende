@@ -1,0 +1,47 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Stack: Next.js 16.2.7 (App Router) + TypeScript 5 (strict) + Tailwind CSS v4
+  DB: PostgreSQL via Prisma 7 (client at src/generated/prisma)
+  Auth: NextAuth v5 (Google OAuth + credentials/bcryptjs)
+  AI: Google Gemini for medical report analysis
+  OCR: Tesseract.js for PDF/image text extraction
+  Val: Zod v4 | Charts: Recharts | Email: Nodemailer
+  Storage: Vercel Blob | CI: Vercel
+  Host: Vercel at https://medicomprende.vercel.app
+
+strict_tdd: false
+testing:
+  runner: none
+  unit: false
+  integration: false
+  e2e: false
+  coverage: false
+  test_command: ""
+  build_command: "next build"
+  lint_command: "eslint src/"
+  typecheck_command: "tsc --noEmit"
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: "next build"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
