@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -82,11 +83,13 @@ export default function RootLayout({
         >
           Saltar al contenido principal
         </a>
-        <ErrorBoundary>
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
-        </ErrorBoundary>
+        <SessionProvider>
+          <ErrorBoundary>
+            <Navbar />
+            <main id="main-content">{children}</main>
+            <Footer />
+          </ErrorBoundary>
+        </SessionProvider>
       </body>
     </html>
   );

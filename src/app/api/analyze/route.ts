@@ -44,27 +44,18 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No se recibió ningún archivo." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No se recibió ningún archivo." }, { status: 400 });
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: "El archivo es muy grande. Máximo 10MB." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "El archivo es muy grande. Máximo 10MB." }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     if (!isValidPdf(buffer)) {
-      return NextResponse.json(
-        { error: "El archivo no parece ser un PDF válido." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "El archivo no parece ser un PDF válido." }, { status: 400 });
     }
 
     let text: string;

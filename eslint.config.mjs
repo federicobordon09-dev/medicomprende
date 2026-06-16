@@ -38,6 +38,7 @@ export default [
       "@next/next/no-html-link-for-pages": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
+      "react-hooks/set-state-in-effect": "warn",
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },

@@ -49,7 +49,7 @@ export default function ComoFunciona() {
           {comoFunciona.steps.map((step, i) => (
             <div
               key={i}
-              className="group relative bg-white rounded-2xl p-7 sm:p-8 text-center shadow-sm hover:shadow-lg border border-sk-100 hover:border-sk-300 transition-all duration-300 reveal"
+              className="group relative bg-white rounded-xl p-7 sm:p-8 text-center border border-sk-200/60 card-hover reveal"
               style={{ transitionDelay: `${i * 120}ms` }}
             >
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stepBgColors[i]} flex items-center justify-center text-white shadow-lg mx-auto mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>

@@ -2,17 +2,27 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { signOut, useSession } from "next-auth/react";
 import { site } from "@/data/contenido";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isInternal = pathname.startsWith("/dashboard") || pathname.startsWith("/login") || pathname.startsWith("/register");
+  const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/login" });
+  };
 
   const scrollTo = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -22,9 +32,11 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-sk-950/95 backdrop-blur-md shadow-lg"
-          : "bg-transparent"
+        isInternal
+          ? "bg-sk-950 shadow-lg"
+          : scrolled
+            ? "bg-sk-950/95 backdrop-blur-md shadow-lg"
+            : "bg-transparent"
       }`}
       aria-label="Navegación principal"
     >
@@ -41,19 +53,82 @@ export default function Navbar() {
             {site.name}
           </span>
         </Link>
+
         <div className="flex items-center gap-1 sm:gap-2">
-          <button
-            onClick={() => scrollTo("como-funciona")}
-            className="text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 flex items-center rounded-lg text-white/80 hover:text-white transition-colors"
-          >
-            Cómo funciona
-          </button>
-          <button
-            onClick={() => scrollTo("faq")}
-            className="text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 flex items-center rounded-lg text-white/80 hover:text-white transition-colors"
-          >
-            FAQ
-          </button>
+          {!isInternal && (
+            <>
+              <button
+                onClick={() => scrollTo("como-funciona")}
+                className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+              >
+                Cómo funciona
+              </button>
+              <button
+                onClick={() => scrollTo("faq")}
+                className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+              >
+                FAQ
+              </button>
+            </>
+          )}
+
+          {session ? (
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 ml-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-full bg-coral-500 flex items-center justify-center text-white text-xs font-bold">
+                  {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-sk-100 z-50 overflow-hidden">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/dashboard/upload"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
+                    >
+                      Subir estudio
+                    </Link>
+                    <Link
+                      href="/dashboard/settings"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-3 text-sm text-warm-700 hover:bg-sk-50"
+                    >
+                      Configuración
+                    </Link>
+                    <hr className="border-sk-100" />
+                    <button
+                      onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                      className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs sm:text-sm font-semibold px-4 py-2.5 min-h-11 flex items-center rounded-xl bg-coral-500 hover:bg-coral-600 text-white transition-all active:scale-[0.97] ml-2"
+            >
+              Iniciar sesión
+            </Link>
+          )}
         </div>
       </div>
     </nav>
