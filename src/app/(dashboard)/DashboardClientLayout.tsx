@@ -36,8 +36,9 @@ export default function DashboardClientLayout({
                 </PageTransition>
             </main>
           </div>
-          <FeedbackWidget />
-        </ToastProvider>
+        </div>
+        <FeedbackWidget />
+      </ToastProvider>
       </AuthGuard>
     </SessionProvider>
   );
