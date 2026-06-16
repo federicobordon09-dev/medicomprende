@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "set NODE_OPTIONS=--no-deprecation && next dev",
     "build": "npx prisma generate && next build",
+    "vercel-build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
