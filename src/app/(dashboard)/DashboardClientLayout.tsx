@@ -6,6 +6,7 @@ import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ToastProvider } from "@/components/ui/Toast";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -33,9 +34,9 @@ export default function DashboardClientLayout({
                 <PageTransition>
                   {children}
                 </PageTransition>
-              </main>
-            </div>
+            </main>
           </div>
+          <FeedbackWidget />
         </ToastProvider>
       </AuthGuard>
     </SessionProvider>
