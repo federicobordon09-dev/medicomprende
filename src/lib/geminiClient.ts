@@ -77,8 +77,11 @@ Estructura exacta requerida:
     {
       "parameter": "Nombre del parámetro",
       "value": "Valor reportado",
-      "explanation": "Qué mide este parámetro y qué significa su valor alterado",
-      "possibleCauses": ["Causa posible 1", "Causa posible 2"]
+      "explanation": "Qué mide este parámetro, qué significa su valor específico (ej: 'Tus triglicéridos están en 165, apenas sobre el límite de 150') y por qué es importante",
+      "possibleCauses": [
+        "Causa 1: extraída del texto del informe o asociación médica directa y conocida para este parámetro (ej: 'HbA1c elevada → prediabetes o diabetes')",
+        "Causa 2: si el informe no menciona causas, asociá la causa clínica más DIRECTA y ESPECÍFICA para ese parámetro (ej: 'Ferritina baja → anemia ferropénica', no 'dieta' genérica)"
+      ]
     }
   ],
   "findings": [
@@ -94,7 +97,7 @@ Estructura exacta requerida:
     }
   ],
   "overallInterpretation": "Interpretación general del estado descripto en el informe, en lenguaje claro, sin alarmar",
-  "possibleCauses": ["Causa general posible 1", "Causa general posible 2"],
+  "possibleCauses": ["Causa general 1 extraída del informe", "Causa general 2 basada en el contexto clínico del informe"],
   "recommendations": [
     "Considerá consultar con un especialista en...",
     "Podría ser útil repetir el estudio en..."
@@ -116,7 +119,16 @@ IMPORTANTE:
 - Si el informe no tiene hallazgos relevantes, indicá que está dentro de parámetros normales.
 - Siempre aclará que la información es educativa.
 - MANTENÉ LA RESPUESTA CORTA y CONCISA. No uses más de 4000 caracteres.
-- El JSON debe estar COMPLETO y BIEN FORMADO. No cortes strings con saltos de línea ni dejes objetos/arrays sin cerrar.`;
+- El JSON debe estar COMPLETO y BIEN FORMADO. No cortes strings con saltos de línea ni dejes objetos/arrays sin cerrar.
+
+REGLAS PARA "possibleCauses":
+- Las causas deben ser CONCRETAS y ESPECÍFICAS, no genéricas.
+- Priodad 1: extraé la causa del texto del informe si está mencionada.
+- Prioridad 2: si el informe no menciona la causa, usá la asociación clínica DIRECTA para ese parámetro (ej: "HbA1c elevada → prediabetes", "LDL alto → hipercolesterolemia", "TSH baja + T4 alta → hipertiroidismo", "ferritina baja → anemia ferropénica").
+- NUNCA uses causas genéricas como "dieta", "estilo de vida", "genética", "factores genéticos", "falta de ejercicio", "herencia" o "sedentarismo" como único contenido. Si el informe no da información, priorizá la causa clínica directa.
+- Ejemplo correcto: ["Prediabetes (resistencia a la insulina)"], no ["Dieta", "Falta de ejercicio"].
+- Si de verdad no hay suficiente información para asociar una causa clínica directa, poné: ["No especificado en el informe"].
+- Como máximo 2 causas por parámetro.`;
 
 /**
  * Analiza un estudio médico con Gemini.
