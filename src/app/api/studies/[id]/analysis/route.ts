@@ -39,17 +39,18 @@ export async function POST(
   try {
     const buffer = await readFileBuffer(study.fileUrl);
 
+    // Siempre intentar extracción con PDF primero (usa pdf2json + pdf-parse internamente)
+    // OCR solo como último recurso (no funciona en Vercel serverless)
     let text: string;
-    if (study.ocrApplied) {
+    const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
+    try {
+      text = await extractTextFromPdf(buffer);
+    } catch {
       const { extractTextFromImage } = await import("@/lib/ocrExtractor");
-      text = await extractTextFromImage(buffer);
-    } else {
-      const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
       try {
-        text = await extractTextFromPdf(buffer);
-      } catch {
-        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
         text = await extractTextFromImage(buffer);
+      } catch {
+        throw new Error("No pudimos extraer texto del archivo. Probá con un PDF que tenga texto seleccionable.");
       }
     }
 
