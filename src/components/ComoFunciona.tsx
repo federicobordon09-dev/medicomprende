@@ -38,7 +38,7 @@ export default function ComoFunciona() {
     <section id="como-funciona" className="py-20 md:py-32 px-4 sm:px-6 bg-gradient-to-b from-azul-50 to-white relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-azul-200/30 rounded-full blur-3xl pointer-events-none" />
       <div className="max-w-5xl mx-auto relative z-10">
-        <div className="text-center mb-14 reveal">
+        <div className="text-center mb-14">
           <h2 className="font-display font-extrabold text-[clamp(1.8rem,4vw,3rem)] text-azul-950 mb-3">
             {comoFunciona.title}
           </h2>
@@ -49,7 +49,7 @@ export default function ComoFunciona() {
           {comoFunciona.steps.map((step, i) => (
             <div
               key={i}
-              className="group relative bg-white rounded-xl p-7 sm:p-8 text-center border border-azul-200/60 card-hover reveal"
+              className="group relative bg-white rounded-xl p-7 sm:p-8 text-center border border-azul-200/60 card-hover"
               style={{ transitionDelay: `${i * 120}ms` }}
             >
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stepBgColors[i]} flex items-center justify-center text-white shadow-lg mx-auto mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>

@@ -149,7 +149,7 @@ function GoogleSignInCard() {
 
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center pt-20 pb-16 md:pb-24 overflow-hidden bg-gradient-to-br from-warm-50 via-azul-50/40 to-white">
+    <section className="relative lg:min-h-[calc(100vh-4rem)] lg:flex lg:items-center pt-20 pb-16 md:pb-24 overflow-hidden bg-gradient-to-br from-warm-50 via-azul-50/40 to-white">
       <DecorativeBlob className="top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-cta-200/25" />
       <DecorativeBlob className="bottom-[-15%] left-[-8%] w-[35rem] h-[35rem] bg-azul-200/25" />
       <DecorativeBlob className="top-[40%] left-[30%] w-[20rem] h-[20rem] bg-celeste-200/20" />

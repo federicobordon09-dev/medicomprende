@@ -12,7 +12,7 @@ export default function Preguntas() {
     <section id="faq" className="py-20 md:py-28 px-4 sm:px-6 bg-gradient-to-b from-azul-50 to-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--color-azul-100)_0%,_transparent_60%)] pointer-events-none" />
       <div className="max-w-2xl mx-auto relative z-10">
-        <div className="text-center mb-12 reveal">
+        <div className="text-center mb-12">
           <h2 className="font-display font-extrabold text-[clamp(1.8rem,4vw,3rem)] text-warm-950">Preguntas frecuentes</h2>
         </div>
         <div className="space-y-3">
@@ -23,7 +23,7 @@ export default function Preguntas() {
             return (
               <div
                 key={i}
-                className={`bg-white border-2 rounded-xl overflow-hidden transition-all duration-300 reveal ${
+                className={`bg-white border-2 rounded-xl overflow-hidden transition-all duration-300 ${
                   isOpen ? "border-azul-400 shadow-lg shadow-azul-200/30" : "border-warm-200 hover:border-azul-300 hover:shadow-md"
                 }`}
               >
