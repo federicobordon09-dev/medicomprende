@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StudyCardSkeleton } from "@/components/ui/Skeleton";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatDate, formatFileSize } from "@/lib/utils";
 import type { StudyWithAnalysis, OutOfRangeValue } from "@/lib/types";
 
@@ -82,10 +84,13 @@ function StatCard({ value, label, sublabel, color }: { value: number; label: str
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [studies, setStudies] = useState<StudyWithAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadAlerts, setUnreadAlerts] = useState(0);
   const [error, setError] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -112,6 +117,21 @@ export default function DashboardPage() {
     }
     loadData();
   }, []);
+
+  const handleDelete = async (studyId: string) => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/studies/${studyId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      setStudies((prev) => prev.filter((s) => s.id !== studyId));
+    } catch {
+      setError("No se pudo eliminar el estudio.");
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(null);
+    }
+  };
 
   const userName = session?.user?.name?.split(" ")[0] || "bienvenido";
 
@@ -231,12 +251,26 @@ export default function DashboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     {severityCount > 0 && (
                       <span className="inline-flex items-center gap-1 bg-cta-100 text-cta-700 text-xs font-medium px-2.5 py-1 rounded-full">
                         {severityCount} alerta{severityCount !== 1 ? "s" : ""}
                       </span>
                     )}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteConfirm(study.id);
+                      }}
+                      className="p-1.5 rounded-lg text-warm-400 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+                      title="Eliminar estudio"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                    </button>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform flex-shrink-0">
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
@@ -252,6 +286,17 @@ export default function DashboardPage() {
           })}
         </div>
       </section>
+
+      <ConfirmDialog
+        open={deleteConfirm !== null}
+        title="Eliminar estudio"
+        message="¿Estás seguro de eliminar este estudio? No se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </div>
   );
 }

@@ -1,9 +1,54 @@
 "use client";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const [deletingStudies, setDeletingStudies] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [confirmStudies, setConfirmStudies] = useState(false);
+  const [confirmAccount, setConfirmAccount] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDeleteStudies = async () => {
+    setDeletingStudies(true);
+    setError("");
+    try {
+      const res = await fetch("/api/studies", { method: "DELETE" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Error" }));
+        throw new Error(err.error || "Error al eliminar");
+      }
+      setConfirmStudies(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al eliminar estudios");
+    } finally {
+      setDeletingStudies(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    setError("");
+    try {
+      const res = await fetch("/api/user/account", { method: "DELETE" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Error" }));
+        throw new Error(err.error || "Error al eliminar");
+      }
+      // Cerrar sesión y redirigir al login
+      const { signOut } = await import("next-auth/react");
+      await signOut({ callbackUrl: "/login" });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al eliminar cuenta");
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
@@ -59,29 +104,48 @@ export default function SettingsPage() {
         <p className="text-sm text-warm-600 mb-4">
           Estas acciones son irreversibles. Eliminar tu cuenta borrará todos tus estudios, análisis y datos.
         </p>
+        {error && (
+          <p className="text-red-600 text-sm mb-3">{error}</p>
+        )}
         <div className="flex gap-3">
           <button
-            onClick={() => {
-              if (confirm("¿Eliminar todos tus estudios? Esta acción no se puede deshacer.")) {
-                // TODO: Implement delete all studies
-              }
-            }}
-            className="bg-white border-2 border-red-300 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 rounded-xl text-sm transition-all"
+            onClick={() => setConfirmStudies(true)}
+            disabled={deletingStudies}
+            className="bg-white border-2 border-red-300 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 rounded-xl text-sm transition-all disabled:opacity-50"
           >
-            Eliminar todos los estudios
+            {deletingStudies ? "Eliminando…" : "Eliminar todos los estudios"}
           </button>
           <button
-            onClick={() => {
-              if (confirm("¿Eliminar tu cuenta? Todos tus datos se perderán permanentemente.")) {
-                // TODO: Implement account deletion
-              }
-            }}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-all"
+            onClick={() => setConfirmAccount(true)}
+            disabled={deletingAccount}
+            className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-all"
           >
-            Eliminar cuenta
+            {deletingAccount ? "Eliminando…" : "Eliminar cuenta"}
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmStudies}
+        title="Eliminar todos los estudios"
+        message="¿Estás seguro? Todos tus estudios y análisis se eliminarán permanentemente. Esta acción no se puede deshacer."
+        confirmLabel={deletingStudies ? "Eliminando…" : "Eliminar todo"}
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={handleDeleteStudies}
+        onCancel={() => { if (!deletingStudies) setConfirmStudies(false); }}
+      />
+
+      <ConfirmDialog
+        open={confirmAccount}
+        title="Eliminar cuenta"
+        message="¿Estás seguro? Todos tus estudios, análisis y datos se eliminarán permanentemente. Esta acción NO se puede deshacer."
+        confirmLabel={deletingAccount ? "Eliminando…" : "Eliminar cuenta"}
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={handleDeleteAccount}
+        onCancel={() => { if (!deletingAccount) setConfirmAccount(false); }}
+      />
     </div>
   );
 }

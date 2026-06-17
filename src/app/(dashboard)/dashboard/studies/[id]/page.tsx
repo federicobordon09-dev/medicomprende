@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatDate } from "@/lib/utils";
 import type { OutOfRangeValue, Finding, MedicalTerm } from "@/lib/types";
 
@@ -44,6 +45,8 @@ export default function StudyDetailPage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -65,6 +68,19 @@ export default function StudyDetailPage() {
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/studies/${study?.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      router.push("/dashboard");
+    } catch {
+      setDeleteConfirm(false);
+      setDeleting(false);
+    }
   };
 
   if (loading) {
@@ -117,12 +133,24 @@ export default function StudyDetailPage() {
             {study.ocrApplied && <Badge variant="warning">OCR</Badge>}
           </div>
         </div>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="text-sm text-warm-500 hover:text-warm-700"
-        >
-          ← Volver
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setDeleteConfirm(true)}
+            className="p-2 rounded-lg text-warm-400 hover:text-red-500 hover:bg-red-50 transition-all"
+            title="Eliminar estudio"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+          </button>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-sm text-warm-500 hover:text-warm-700"
+          >
+            ← Volver
+          </button>
+        </div>
       </div>
 
       {analysis ? (
@@ -399,6 +427,17 @@ export default function StudyDetailPage() {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirm}
+        title="Eliminar estudio"
+        message="¿Estás seguro de eliminar este estudio? No se puede deshacer."
+        confirmLabel={deleting ? "Eliminando…" : "Eliminar"}
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => { if (!deleting) setDeleteConfirm(false); }}
+      />
     </div>
   );
 }

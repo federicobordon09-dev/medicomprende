@@ -206,3 +206,40 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // Si viene un array de ids en el body, eliminar solo esos
+  // Si no, eliminar todos los estudios del usuario
+  const body = await request.json().catch(() => null);
+  const ids: string[] | null = body?.ids ?? null;
+
+  try {
+    const where = ids
+      ? { id: { in: ids }, userId: session.user.id }
+      : { userId: session.user.id };
+
+    const studies = await prisma.study.findMany({ where, select: { id: true, fileUrl: true } });
+
+    // Eliminar archivos del blob storage
+    for (const study of studies) {
+      try {
+        const { deletePdf } = await import("@/lib/blob");
+        await deletePdf(study.fileUrl);
+      } catch {
+        // Si falla la eliminación del blob, igual seguimos
+      }
+    }
+
+    await prisma.study.deleteMany({ where });
+
+    return NextResponse.json({ deleted: studies.length });
+  } catch (error) {
+    console.error("Batch delete error:", error);
+    return NextResponse.json({ error: "Error al eliminar estudios." }, { status: 500 });
+  }
+}
