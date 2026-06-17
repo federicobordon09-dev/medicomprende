@@ -363,15 +363,28 @@ export default function StudyDetailPage() {
               if (analyzing) return;
               setAnalyzing(true);
               setAnalyzeError("");
+
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 90000);
+
               try {
-                const res = await fetch(`/api/studies/${study.id}/analysis`, { method: "POST" });
+                const res = await fetch(`/api/studies/${study.id}/analysis`, {
+                  method: "POST",
+                  signal: controller.signal,
+                });
+                clearTimeout(timeoutId);
                 if (!res.ok) {
                   const err = await res.json().catch(() => ({ error: "Error desconocido" }));
                   throw new Error(err.error || `Error ${res.status}`);
                 }
                 window.location.reload();
               } catch (e) {
-                setAnalyzeError(e instanceof Error ? e.message : "Error al analizar el estudio");
+                clearTimeout(timeoutId);
+                if (e instanceof DOMException && e.name === "AbortError") {
+                  setAnalyzeError("El análisis está tardando demasiado. Probá de nuevo más tarde.");
+                } else {
+                  setAnalyzeError(e instanceof Error ? e.message : "Error al analizar el estudio");
+                }
               } finally {
                 setAnalyzing(false);
               }

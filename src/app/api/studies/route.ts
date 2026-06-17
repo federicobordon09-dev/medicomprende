@@ -7,6 +7,8 @@ import { extractTextFromImage } from "@/lib/ocrExtractor";
 import { analyzeReport } from "@/lib/geminiClient";
 import { sha256 } from "@/lib/utils";
 
+export const maxDuration = 120;
+
 export async function GET(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {

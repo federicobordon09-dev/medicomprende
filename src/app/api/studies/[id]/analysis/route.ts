@@ -5,6 +5,8 @@ import { analyzeReport } from "@/lib/geminiClient";
 import fs from "fs/promises";
 import path from "path";
 
+export const maxDuration = 120;
+
 async function readFileBuffer(fileUrl: string): Promise<Buffer> {
   if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
     const response = await fetch(fileUrl);
