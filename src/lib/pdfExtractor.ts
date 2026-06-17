@@ -8,7 +8,8 @@ function decodeText(encoded: string): string {
   }
 }
 
-export function extractTextFromPdf(buffer: Buffer): Promise<string> {
+/** Extraer texto usando pdf2json (rápido, PDFs con texto seleccionable) */
+function extractWithPdf2json(buffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
     const parser = new PDFParser();
 
@@ -19,7 +20,7 @@ export function extractTextFromPdf(buffer: Buffer): Promise<string> {
           : err instanceof Error
             ? err.message
             : "formato no soportado";
-      reject(new Error(`No pudimos leer el PDF: ${msg}`));
+      reject(new Error(msg));
     });
 
     parser.on("pdfParser_dataReady", (data) => {
@@ -37,4 +38,35 @@ export function extractTextFromPdf(buffer: Buffer): Promise<string> {
 
     parser.parseBuffer(buffer);
   });
+}
+
+/** Extraer texto usando pdf-parse (mozilla pdf.js, más tolerante con formatos raros) */
+async function extractWithPdfParse(buffer: Buffer): Promise<string> {
+  // pdf-parse usa import() dinámico interno con require — lo forzamos con import
+  const pdfParse = (await import("pdf-parse")).default;
+  const data = await pdfParse(buffer);
+  return data.text || "";
+}
+
+/**
+ * Intenta extraer texto de un PDF.
+ * Primero prueba pdf2json (rápido).
+ * Si falla (XRef inválido, formato no soportado), prueba pdf-parse.
+ * Si ambos fallan, lanza error.
+ */
+export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
+  // 1er intento: pdf2json
+  try {
+    return await extractWithPdf2json(buffer);
+  } catch {
+    // 2do intento: pdf-parse (más robusto)
+  }
+
+  const text = await extractWithPdfParse(buffer);
+  if (!text || text.trim().length < 20) {
+    throw new Error(
+      "No pudimos leer el texto del PDF. Probá con un PDF que tenga texto seleccionable (no escaneado)."
+    );
+  }
+  return text;
 }
