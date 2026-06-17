@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ToastProvider } from "@/components/ui/Toast";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,6 +27,7 @@ export default function DashboardClientLayout({
     <SessionProvider>
       <AuthGuard>
         <ToastProvider>
+          <OnboardingModal />
           <div className="h-dvh bg-azul-50 flex overflow-hidden">
             <Sidebar />
             <div className="flex-1 flex flex-col min-w-0">

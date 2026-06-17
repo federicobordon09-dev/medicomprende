@@ -39,13 +39,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
+    async jwt({ token, user, trigger, session: triggerSession }) {
+      if (user) {
+        token.id = user.id;
+        token.firstName = (user as any).firstName;
+        token.lastName = (user as any).lastName;
+        token.age = (user as any).age;
+      }
+      if (trigger === "update" && triggerSession) {
+        token.firstName = (triggerSession as any).firstName ?? token.firstName;
+        token.lastName = (triggerSession as any).lastName ?? token.lastName;
+        token.age = (triggerSession as any).age ?? token.age;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.firstName = (token as any).firstName;
+        session.user.lastName = (token as any).lastName;
+        session.user.age = (token as any).age;
       }
       return session;
     },
