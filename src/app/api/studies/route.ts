@@ -145,10 +145,23 @@ export async function POST(request: NextRequest) {
       });
     } catch (err) {
       console.error("Analysis error for study", study.id, err);
+      const msg = err instanceof Error ? err.message : "";
+      let userError: string;
+      let status: number;
+      if (msg.includes("API_KEY") || msg.includes("API key")) {
+        userError = "La API key de Gemini no está configurada correctamente.";
+        status = 500;
+      } else if (msg.includes("quota") || msg.includes("RATE_LIMIT") || msg.includes("429")) {
+        userError = "La IA alcanzó su límite diario de análisis. Esperá a mañana o upgradéá el plan de Gemini API.";
+        status = 429;
+      } else {
+        userError = "El archivo se guardó pero no pudimos analizarlo con la IA. Intentalo de nuevo desde el historial.";
+        status = 500;
+      }
       return NextResponse.json({
         study: { ...study, analysis: null },
-        error: "El archivo se guardó pero no pudimos analizarlo con la IA. Intentalo de nuevo desde el historial.",
-      }, { status: 500 });
+        error: userError,
+      }, { status });
     }
 
     return NextResponse.json({
@@ -198,7 +211,10 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await prisma.study.deleteMany({ where });
+    await prisma.$transaction([
+      prisma.comparisonStudy.deleteMany({ where: { studyId: { in: studies.map(s => s.id) } } }),
+      prisma.study.deleteMany({ where }),
+    ]);
 
     return NextResponse.json({ deleted: studies.length });
   } catch (error) {

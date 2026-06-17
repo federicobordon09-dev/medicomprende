@@ -65,7 +65,10 @@ export async function DELETE(
     console.warn("Could not delete blob for study", id);
   }
 
-  await prisma.study.delete({ where: { id } });
+  await prisma.$transaction([
+    prisma.comparisonStudy.deleteMany({ where: { studyId: id } }),
+    prisma.study.delete({ where: { id } }),
+  ]);
 
   return NextResponse.json({ success: true });
 }

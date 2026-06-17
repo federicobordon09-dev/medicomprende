@@ -171,9 +171,16 @@ export async function analyzeReport(
       ]);
       rawText = result.response.text();
     } catch (inlineErr) {
-      // Si Gemini rechazó el archivo inline, intentamos extraer texto con pdf-parse
+      // Si es un error de cuota (429), no tiene sentido reintentar con texto
+      // porque el fallback también va a pegar a Gemini y fallar igual.
+      const inlineMsg = inlineErr instanceof Error ? inlineErr.message : "";
+      if (inlineMsg.includes("429") || inlineMsg.includes("quota") || inlineMsg.includes("RATE_LIMIT")) {
+        throw new Error(`Gemini: ${inlineMsg}`);
+      }
+
+      // Si Gemini rechazó el archivo inline (PDF no soportado), intentamos extraer texto con pdf-parse
       // y mandar el texto (funciona para cualquier PDF con texto seleccionable).
-      console.warn("Inline file submission failed, falling back to text extraction:", inlineErr instanceof Error ? inlineErr.message : inlineErr);
+      console.warn("Inline file submission failed, falling back to text extraction:", inlineMsg);
       try {
         const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
         const extractedText = await extractTextFromPdf(textOrBuffer);

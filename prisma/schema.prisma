@@ -129,7 +129,7 @@ model ComparisonStudy {
   comparisonId String
   comparison   Comparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
   studyId      String
-  study        Study      @relation(fields: [studyId], references: [id])
+  study        Study      @relation(fields: [studyId], references: [id], onDelete: Cascade)
   orderIndex   Int
   @@id([comparisonId, studyId])
 }

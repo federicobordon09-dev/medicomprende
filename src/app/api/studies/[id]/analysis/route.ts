@@ -112,7 +112,7 @@ export async function POST(
     }
     if (message.includes("quota") || message.includes("RATE_LIMIT") || message.includes("429")) {
       return NextResponse.json(
-        { error: "La IA está sobrecargada. Esperá un minuto e intentá de nuevo." },
+        { error: "La IA alcanzó su límite diario de análisis gratis. Esperá a mañana o configurá un plan pago en console.cloud.google.com." },
         { status: 429 }
       );
     }
