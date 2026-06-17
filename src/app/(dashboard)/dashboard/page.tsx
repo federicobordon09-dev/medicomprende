@@ -160,7 +160,7 @@ export default function DashboardPage() {
         <h2 className="font-display font-bold text-xl text-warm-950">
           Hola, {userName}
         </h2>
-        <p className="text-warm-500 mt-1 text-sm">
+        <p className="text-warm-600 mt-1 text-sm">
           {studies.length > 0
             ? `Tenés ${studies.length} estudio${studies.length !== 1 ? "s" : ""} guardado${studies.length !== 1 ? "s" : ""}.`
             : "Empezá subiendo tu primer estudio médico."}
@@ -221,11 +221,11 @@ export default function DashboardPage() {
                     <p className="font-semibold text-warm-950 truncate">
                       {study.title}
                     </p>
-                    <p className="text-sm text-warm-500">
+                    <p className="text-sm text-warm-600">
                       {study.studyType || "Estudio médico"} &middot; {formatDate(study.createdAt)} &middot; {formatFileSize(study.fileSize)}
                     </p>
                     {study.profile && (
-                      <span className="inline-flex items-center gap-1.5 mt-1 text-xs text-warm-400">
+                      <span className="inline-flex items-center gap-1.5 mt-1 text-xs text-warm-500">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: study.profile.color }} />
                         {study.profile.name}
                       </span>
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 {study.analysis?.summary && (
-                  <p className="mt-3 text-sm text-warm-600 line-clamp-2 pl-15">
+                  <p className="mt-3 text-sm text-warm-700 line-clamp-2 pl-15">
                     {study.analysis.summary}
                   </p>
                 )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -9,17 +9,11 @@ import { site } from "@/data/contenido";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isInternal = pathname.startsWith("/dashboard") || pathname.startsWith("/register");
   const isLoginPage = pathname === "/login";
+  const showMarketingNav = pathname === "/login";
+  const showLoginButton = !isLoginPage && pathname !== "/register" && !pathname.startsWith("/dashboard");
   const { data: session } = useSession();
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -32,13 +26,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-500 ${
-        isInternal
-          ? "bg-azul-950 shadow-lg"
-          : scrolled
-            ? "bg-azul-950/95 backdrop-blur-md shadow-lg"
-            : "bg-transparent"
-      }`}
+      className="fixed top-0 left-0 right-0 h-16 z-50 bg-azul-950 shadow-lg"
       aria-label="Navegación principal"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
@@ -56,7 +44,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          {!isInternal && (
+          {showMarketingNav && (
             <>
               <button
                 onClick={() => scrollTo("como-funciona")}
@@ -122,7 +110,7 @@ export default function Navbar() {
                 </>
               )}
             </div>
-          ) : !isLoginPage ? (
+          ) : showLoginButton ? (
             <Link
               href="/login"
               className="text-xs sm:text-sm font-semibold px-4 py-2.5 min-h-11 flex items-center rounded-xl bg-cta-500 hover:bg-cta-600 text-white transition-all active:scale-[0.97] ml-2"

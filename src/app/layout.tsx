@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import "aos/dist/aos.css";
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
