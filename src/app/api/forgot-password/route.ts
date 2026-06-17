@@ -12,6 +12,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email inválido." }, { status: 400 });
     }
 
+    // Verificar que la API key de Resend esté configurada
+    if (!process.env.RESEND_API_KEY) {
+      console.error("[forgot-password] RESEND_API_KEY no está configurada");
+      return NextResponse.json(
+        { error: "El servicio de email no está configurado. Contactá al administrador." },
+        { status: 500 }
+      );
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
 
     // Buscar usuario — no revelar si existe o no (seguridad)
@@ -33,10 +42,14 @@ export async function POST(request: Request) {
         },
       });
 
-      // Enviar email (fire-and-forget — no bloqueamos la respuesta)
-      sendPasswordResetEmail(normalizedEmail, token).catch((err) => {
-        console.error("[forgot-password] Error sending email:", err);
-      });
+      // Enviar email (await real para detectar errores)
+      try {
+        await sendPasswordResetEmail(normalizedEmail, token);
+        console.log(`[forgot-password] Email enviado a: ${normalizedEmail}`);
+      } catch (emailErr) {
+        // No devolver error al cliente (seguridad), pero loguearlo
+        console.error("[forgot-password] Error enviando email:", emailErr);
+      }
     }
 
     // Siempre devolver éxito
