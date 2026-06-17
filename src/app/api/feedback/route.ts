@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Completá todos los campos requeridos." }, { status: 400 });
     }
 
-    if (!["Bug", "Sugerencia", "Idea"].includes(type)) {
+    if (!["Sugerencia", "Reportar error"].includes(type)) {
       return NextResponse.json({ error: "Tipo de mensaje inválido." }, { status: 400 });
     }
 
