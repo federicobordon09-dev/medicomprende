@@ -42,6 +42,8 @@ export default function StudyDetailPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("summary");
   const [copied, setCopied] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -358,15 +360,30 @@ export default function StudyDetailPage() {
           <p className="text-warm-600 mb-4">Este estudio aún no tiene análisis disponible.</p>
           <button
             onClick={async () => {
-              const res = await fetch(`/api/studies/${study.id}/analysis`, { method: "POST" });
-              if (res.ok) {
+              if (analyzing) return;
+              setAnalyzing(true);
+              setAnalyzeError("");
+              try {
+                const res = await fetch(`/api/studies/${study.id}/analysis`, { method: "POST" });
+                if (!res.ok) {
+                  const err = await res.json().catch(() => ({ error: "Error desconocido" }));
+                  throw new Error(err.error || `Error ${res.status}`);
+                }
                 window.location.reload();
+              } catch (e) {
+                setAnalyzeError(e instanceof Error ? e.message : "Error al analizar el estudio");
+              } finally {
+                setAnalyzing(false);
               }
             }}
-            className="bg-cta-500 hover:bg-cta-600 text-white font-semibold px-6 py-2.5 rounded-xl transition-all"
+            disabled={analyzing}
+            className="bg-cta-500 hover:bg-cta-600 disabled:bg-cta-300 text-white font-semibold px-6 py-2.5 rounded-xl transition-all active:scale-[0.97] disabled:active:scale-100"
           >
-            Analizar ahora
+            {analyzing ? "Analizando…" : "Analizar ahora"}
           </button>
+          {analyzeError && (
+            <p className="text-red-600 text-sm mt-3">{analyzeError}</p>
+          )}
         </div>
       )}
     </div>
