@@ -154,8 +154,7 @@ function ForgotPasswordModal({ open, onClose }: { open: boolean; onClose: () => 
                 Ingresá tu email y te enviaremos instrucciones para restablecerla.
               </p>
             </div>
-      <ForgotPasswordModal open={showForgot} onClose={() => setShowForgot(false)} />
-      <form id="login-form" onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="reset-email" className="block text-sm font-medium text-warm-700 mb-1.5">Email</label>
                 <input

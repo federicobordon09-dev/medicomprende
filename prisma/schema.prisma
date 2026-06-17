@@ -21,6 +21,8 @@ model User {
   studies        Study[]
   comparisons    Comparison[]
   alerts         Alert[]
+  resetToken     String?         @unique
+  resetTokenExpiry DateTime?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
