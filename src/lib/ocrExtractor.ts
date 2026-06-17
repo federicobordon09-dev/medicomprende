@@ -23,6 +23,13 @@ async function getWorker(timeoutMs = 8000): Promise<Awaited<ReturnType<typeof cr
 }
 
 export async function extractTextFromImage(buffer: Buffer): Promise<string> {
+  // Fast-fail si estamos en Vercel serverless (Tesseract.js no funciona)
+  if (process.env.VERCEL === "1") {
+    throw new Error(
+      "El reconocimiento óptico (OCR) no está disponible en Vercel. Probá con un PDF que tenga texto seleccionable."
+    );
+  }
+
   try {
     const w = await getWorker();
     const { data } = await w.recognize(buffer);
@@ -32,7 +39,7 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
     }
     return text;
   } catch (e) {
-    // Tesseract.js puede fallar en entornos serverless (Vercel) por
+    // Tesseract.js puede fallar en entornos serverless por
     // incompatibilidad con workers nativos. Devolvemos un error claro.
     const msg = e instanceof Error ? e.message : "";
     if (
