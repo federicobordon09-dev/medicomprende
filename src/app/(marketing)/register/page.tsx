@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 function UserPlusIcon() {
@@ -62,6 +63,23 @@ function GoogleSignUpCard() {
 }
 
 export default function RegisterPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-2 border-azul-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <section className="relative lg:min-h-[calc(100vh-4rem)] lg:flex lg:items-center pt-20 pb-16 md:pb-24 overflow-hidden bg-gradient-to-br from-warm-50 via-azul-50/40 to-white">
       <div className="absolute rounded-full opacity-30 blur-3xl pointer-events-none top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-cta-200/25" aria-hidden="true" />

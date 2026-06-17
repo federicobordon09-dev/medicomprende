@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AOS from "aos";
@@ -245,6 +246,9 @@ function HeroSection() {
 }
 
 export default function LoginPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
   useEffect(() => {
     AOS.init({
       duration: 600,
@@ -253,6 +257,20 @@ export default function LoginPage() {
       offset: 80,
     });
   }, []);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-2 border-azul-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>

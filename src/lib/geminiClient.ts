@@ -191,10 +191,47 @@ export async function analyzeReport(text: string): Promise<ReportResultV2> {
     }
   }
 
+  // Sanitizar: filtrar items incompletos en arrays antes de validar
+  // La IA a veces devuelve objetos sin campos requeridos
+  function sanitizeGeminiResponse(data: unknown): unknown {
+    if (!data || typeof data !== "object" || Array.isArray(data)) return data;
+
+    const obj = { ...(data as Record<string, unknown>) };
+
+    const arrayFields: Record<string, string[]> = {
+      medicalTerms: ["term"],
+      findings: ["original"],
+      outOfRangeValues: ["parameter"],
+      parameterExplanations: ["parameter"],
+    };
+
+    for (const [key, requiredFields] of Object.entries(arrayFields)) {
+      if (!Array.isArray(obj[key])) continue;
+      const before = (obj[key] as unknown[]).length;
+      obj[key] = (obj[key] as unknown[]).filter((item) => {
+        if (!item || typeof item !== "object") return false;
+        return requiredFields.every((f) => {
+          const v = (item as Record<string, unknown>)[f];
+          return typeof v === "string" && v.trim().length > 0;
+        });
+      });
+      const after = (obj[key] as unknown[]).length;
+      if (after < before) {
+        console.warn(
+          `[Gemini] Filtrados ${before - after} item(s) inválidos de "${key}" durante sanitización`
+        );
+      }
+    }
+
+    return obj;
+  }
+
+  parsed = sanitizeGeminiResponse(parsed);
+
   const validation = ReportResultV2Schema.safeParse(parsed);
 
   if (!validation.success) {
-    console.error("Validation error:", validation.error.flatten());
+    console.error("Validation error (incluso después de sanitizar):", validation.error.flatten());
     throw new Error("La IA devolvió una respuesta con formato incorrecto. Intentalo de nuevo.");
   }
 
