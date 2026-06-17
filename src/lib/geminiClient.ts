@@ -19,27 +19,27 @@ function getClient(): GoogleGenerativeAI {
 }
 
 const FindingSchema = z.object({
-  original: z.string().min(1),
-  simplified: z.string().min(1),
+  original: z.string().min(1).catch(""),
+  simplified: z.string().min(1).catch(""),
 });
 
 const MedicalTermSchema = z.object({
-  term: z.string().min(1),
-  definition: z.string().min(1),
+  term: z.string().min(1).catch(""),
+  definition: z.string().min(1).catch(""),
 });
 
 const OutOfRangeSchema = z.object({
-  parameter: z.string().min(1),
-  value: z.string().min(1),
-  referenceRange: z.string().min(1),
-  status: z.enum(["elevado", "disminuido", "borderline", "normal"]),
-  explanation: z.string().min(1),
+  parameter: z.string().min(1).catch("Parámetro desconocido"),
+  value: z.string().min(1).catch(""),
+  referenceRange: z.string().min(1).catch(""),
+  status: z.enum(["elevado", "disminuido", "borderline", "normal"]).catch("normal"),
+  explanation: z.string().min(1).catch(""),
 });
 
 const ParameterExplanationSchema = z.object({
-  parameter: z.string().min(1),
-  value: z.string().min(1),
-  explanation: z.string().min(1),
+  parameter: z.string().min(1).catch(""),
+  value: z.string().min(1).catch(""),
+  explanation: z.string().min(1).catch(""),
   possibleCauses: z.array(z.string()).default([]),
 });
 
@@ -330,7 +330,7 @@ IMPORTANTE:
   const cleanedText = rawText.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
   const parsed = JSON.parse(cleanedText);
   const validated = z.object({
-    summary: z.string().min(1),
+    summary: z.string().min(1).catch(""),
     findings: z.array(FindingSchema).default([]),
     medicalTerms: z.array(MedicalTermSchema).default([]),
     overallInterpretation: z.string().default(""),
