@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadPdf } from "@/lib/blob";
-import { extractTextFromPdf } from "@/lib/pdfExtractor";
 import { analyzeReport } from "@/lib/geminiClient";
 import { sha256 } from "@/lib/utils";
 
@@ -101,56 +100,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isImage = file.type.startsWith("image/");
-    const isPdfWithText = file.type === "application/pdf";
-
-    let text: string;
-    let ocrApplied = false;
-
-    if (isImage) {
-      try {
-        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
-        text = await extractTextFromImage(buffer);
-        ocrApplied = true;
-      } catch (e) {
-        return NextResponse.json(
-          { error: e instanceof Error ? e.message : "No pudimos extraer texto de la imagen. Probá con un PDF con texto seleccionable." },
-          { status: 400 }
-        );
-      }
-    } else if (isPdfWithText) {
-      try {
-        text = await extractTextFromPdf(buffer);
-      } catch (e) {
-        // OCR (Tesseract.js) no funciona en Vercel serverless.
-        // Si estamos en Vercel, damos un error claro sin intentar OCR.
-        if (process.env.VERCEL === "1") {
-          return NextResponse.json(
-            { error: "Este PDF no tiene texto seleccionable. En Vercel no podemos hacer OCR. Probá con un PDF que tenga texto seleccionable." },
-            { status: 400 }
-          );
-        }
-
-        try {
-          const { extractTextFromImage } = await import("@/lib/ocrExtractor");
-          text = await extractTextFromImage(buffer);
-          ocrApplied = true;
-        } catch (ocrErr) {
-          return NextResponse.json(
-            { error: ocrErr instanceof Error ? ocrErr.message : "No pudimos extraer texto del PDF. Probá con un PDF que tenga texto seleccionable." },
-            { status: 400 }
-          );
-        }
-      }
-    } else {
+    if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
       return NextResponse.json({ error: "Formato no soportado. Usá PDF o imagen." }, { status: 400 });
-    }
-
-    if (!text || text.trim().length < 20) {
-      return NextResponse.json(
-        { error: "No pudimos extraer texto del archivo. Asegurate de que tenga texto seleccionable." },
-        { status: 400 }
-      );
     }
 
     const fileUrl = await uploadPdf(buffer, file.name, session.user.id);
@@ -164,7 +115,7 @@ export async function POST(request: NextRequest) {
         fileHash,
         fileSize: file.size,
         fileMimeType: file.type,
-        ocrApplied,
+        ocrApplied: false,
         notes: notes || null,
         profileId,
         userId: session.user.id,
@@ -173,7 +124,9 @@ export async function POST(request: NextRequest) {
 
     let analysis;
     try {
-      const result = await analyzeReport(text);
+      // Enviamos el archivo directo a Gemini (PDF o imagen).
+      // Gemini extrae el texto y lo analiza internamente - no necesita OCR ni extracción previa.
+      const result = await analyzeReport(buffer, file.type);
       analysis = await prisma.analysis.create({
         data: {
           studyId: study.id,

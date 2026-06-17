@@ -118,7 +118,19 @@ IMPORTANTE:
 - MANTENÉ LA RESPUESTA CORTA y CONCISA. No uses más de 4000 caracteres.
 - El JSON debe estar COMPLETO y BIEN FORMADO. No cortes strings con saltos de línea ni dejes objetos/arrays sin cerrar.`;
 
-export async function analyzeReport(text: string): Promise<ReportResultV2> {
+/**
+ * Analiza un estudio médico con Gemini.
+ *
+ * @param textOrBuffer - Texto extraído del informe, o buffer con el archivo original
+ * @param mimeType - Obligatorio si se pasa un buffer: MIME type del archivo (application/pdf, image/jpeg, etc.)
+ *
+ * Cuando se pasa un buffer, Gemini recibe el archivo directo via inlineData
+ * y extrae el texto + lo analiza en un solo paso. No necesita OCR ni extracción previa.
+ */
+export async function analyzeReport(
+  textOrBuffer: string | Buffer,
+  mimeType?: string
+): Promise<ReportResultV2> {
   const client = getClient();
   const model = client.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
@@ -129,19 +141,32 @@ export async function analyzeReport(text: string): Promise<ReportResultV2> {
     },
   });
 
-  const prompt = `${SYSTEM_PROMPT_V2}\n\n---\n\n${text}`;
-
-  let rawText: string;
+  let result;
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    rawText = response.text();
+    if (typeof textOrBuffer !== "string") {
+      // Modo archivo: mandamos el PDF/imagen directo a Gemini via inlineData.
+      // Gemini extrae el texto y lo analiza internamente.
+      result = await model.generateContent([
+        {
+          inlineData: {
+            mimeType: mimeType || "application/pdf",
+            data: textOrBuffer.toString("base64"),
+          },
+        },
+        { text: SYSTEM_PROMPT_V2 },
+      ]);
+    } else {
+      // Modo texto legacy: mandamos el texto ya extraído
+      result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${textOrBuffer}`);
+    }
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Gemini: ${err.message}`);
     }
     throw new Error("Error de conexión con la IA.");
   }
+
+  const rawText = result.response.text();
 
   if (!rawText || rawText.trim().length === 0) {
     throw new Error("La IA no devolvió contenido. El informe podría estar vacío o ser ilegible.");

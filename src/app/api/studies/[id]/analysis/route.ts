@@ -39,27 +39,9 @@ export async function POST(
   try {
     const buffer = await readFileBuffer(study.fileUrl);
 
-    // Siempre intentar extracción con PDF primero (usa pdf2json + pdf-parse internamente)
-    // OCR solo como último recurso (no funciona en Vercel serverless)
-    let text: string;
-    const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
-    try {
-      text = await extractTextFromPdf(buffer);
-    } catch {
-      // OCR no disponible en Vercel serverless - damos error claro sin intentar OCR
-      if (process.env.VERCEL === "1") {
-        throw new Error("Este PDF no tiene texto seleccionable. En Vercel no podemos hacer OCR. Probá con un PDF que tenga texto seleccionable.");
-      }
-
-      try {
-        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
-        text = await extractTextFromImage(buffer);
-      } catch (e) {
-        throw new Error(e instanceof Error ? e.message : "No pudimos extraer texto del archivo. Probá con un PDF que tenga texto seleccionable.");
-      }
-    }
-
-    const result = await analyzeReport(text);
+    // Enviamos el archivo directo a Gemini (PDF o imagen).
+    // Gemini extrae el texto Y lo analiza internamente - no necesita OCR ni extracción previa.
+    const result = await analyzeReport(buffer, study.fileMimeType);
 
     if (study.analysis) {
       const updated = await prisma.analysis.update({

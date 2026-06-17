@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractTextFromPdf } from "@/lib/pdfExtractor";
 import { analyzeReport } from "@/lib/geminiClient";
 
 const rateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -47,6 +46,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No se recibió ningún archivo." }, { status: 400 });
     }
 
+    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: "Formato no soportado. Usá PDF o imagen." }, { status: 400 });
+    }
+
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: "El archivo es muy grande. Máximo 10MB." }, { status: 400 });
     }
@@ -54,30 +58,14 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    if (!isValidPdf(buffer)) {
+    if (file.type === "application/pdf" && !isValidPdf(buffer)) {
       return NextResponse.json({ error: "El archivo no parece ser un PDF válido." }, { status: 400 });
     }
 
-    let text: string;
-    try {
-      text = await extractTextFromPdf(buffer);
-    } catch {
-      return NextResponse.json(
-        { error: "No pudimos leer el PDF. Asegurate de que tenga texto seleccionable (no escaneado)." },
-        { status: 400 }
-      );
-    }
-
-    if (!text || text.trim().length < 20) {
-      return NextResponse.json(
-        { error: "El PDF parece estar vacío o ser una imagen escaneada. Necesitamos texto seleccionable." },
-        { status: 400 }
-      );
-    }
-
+    // Enviamos el archivo directo a Gemini. Gemini extrae el texto y lo analiza internamente.
     let result;
     try {
-      result = await analyzeReport(text);
+      result = await analyzeReport(buffer, file.type);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       console.error("Gemini analysis error:", message);
