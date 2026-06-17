@@ -57,18 +57,26 @@ async function extractWithPdfParse(buffer: Buffer): Promise<string> {
  * Si ambos fallan, lanza error.
  */
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
-  // 1er intento: pdf2json
+  // 1er intento: pdf2json (rápido, PDFs con texto seleccionable)
   try {
     return await extractWithPdf2json(buffer);
   } catch {
-    // 2do intento: pdf-parse (más robusto)
+    // Fall through a pdf-parse
   }
 
-  const text = await extractWithPdfParse(buffer);
-  if (!text || text.trim().length < 20) {
-    throw new Error(
-      "No pudimos leer el texto del PDF. Probá con un PDF que tenga texto seleccionable (no escaneado)."
-    );
+  // 2do intento: pdf-parse (Mozilla pdf.js, más tolerante con formatos raros)
+  // NOTA: En Vercel serverless pdfjs-dist muestra warnings de canvas polyfills,
+  // pero para extracción de texto (getText()) funcionan correctamente.
+  try {
+    const text = await extractWithPdfParse(buffer);
+    if (text && text.trim().length >= 20) {
+      return text;
+    }
+  } catch {
+    // Ambos métodos fallaron
   }
-  return text;
+
+  throw new Error(
+    "No pudimos leer el texto del PDF. Probá con un PDF que tenga texto seleccionable (no escaneado)."
+  );
 }

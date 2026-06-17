@@ -1,27 +1,11 @@
-import { createWorker } from "tesseract.js";
-
-let worker: Awaited<ReturnType<typeof createWorker>> | null = null;
-
-/** Crea o reusa un worker Tesseract con timeout para evitar hangs en serverless */
-async function getWorker(timeoutMs = 8000): Promise<Awaited<ReturnType<typeof createWorker>>> {
-  if (worker) return worker;
-
-  // Tesseract.js lanza uncaught exceptions dentro del worker thread que
-  // nunca rechazan la Promise. Usamos Promise.race con un timeout.
-  const workerPromise = createWorker("spa");
-  const timeout = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error("OCR_TIMEOUT")), timeoutMs);
-  });
-
-  try {
-    worker = await Promise.race([workerPromise, timeout]);
-    return worker;
-  } catch (e) {
-    worker = null; // resetear para reintentos futuros
-    throw e;
-  }
-}
-
+/**
+ * Extrae texto de una imagen usando OCR (Tesseract.js).
+ *
+ * IMPORTANTE: tesseract.js se importa DINÁMICAMENTE dentro de la función.
+ * Esto evita que su worker thread se inicie al cargar el módulo, lo cual
+ * causaba uncaught exceptions en entornos serverless (Vercel). En Vercel
+ * esta función falla rápidamente sin llegar a importar tesseract.js.
+ */
 export async function extractTextFromImage(buffer: Buffer): Promise<string> {
   // Fast-fail si estamos en Vercel serverless (Tesseract.js no funciona)
   if (process.env.VERCEL === "1") {
@@ -30,27 +14,46 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
     );
   }
 
+  // Lazy import: tesseract.js solo se carga CUANDO se llama esta función,
+  // no al cargar el módulo. Esto evita worker threads colgados en serverless.
+  type TesseractModule = typeof import("tesseract.js");
+  let createWorker: TesseractModule["createWorker"];
   try {
-    const w = await getWorker();
-    const { data } = await w.recognize(buffer);
+    createWorker = (await import("tesseract.js")).createWorker;
+  } catch {
+    throw new Error(
+      "El motor OCR no está disponible. Instalá tesseract.js o usá un PDF con texto seleccionable."
+    );
+  }
+
+  // Timeout para evitar que el worker cuele en serverless
+  const workerPromise = createWorker("spa");
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error("OCR_TIMEOUT")), 8000);
+  });
+
+  let worker: Awaited<ReturnType<typeof createWorker>> | null = null;
+  try {
+    worker = await Promise.race([workerPromise, timeout]);
+  } catch {
+    throw new Error(
+      "El reconocimiento óptico (OCR) no está disponible en este entorno. Probá con un PDF que tenga texto seleccionable."
+    );
+  }
+
+  try {
+    const { data } = await worker.recognize(buffer);
     const text = data.text.trim();
     if (text.length < 20) {
       throw new Error("No se pudo extraer texto suficiente de la imagen.");
     }
     return text;
-  } catch (e) {
-    // Tesseract.js puede fallar en entornos serverless por
-    // incompatibilidad con workers nativos. Devolvemos un error claro.
-    const msg = e instanceof Error ? e.message : "";
-    if (
-      msg.includes("Cannot find module") ||
-      msg.includes("MODULE_NOT_FOUND") ||
-      msg === "OCR_TIMEOUT"
-    ) {
-      throw new Error(
-        "El reconocimiento óptico (OCR) no está disponible en este entorno. Probá con un PDF que tenga texto seleccionable."
-      );
+  } finally {
+    // Siempre terminar el worker para no acumular procesos colgados
+    try {
+      await worker.terminate();
+    } catch {
+      // Si falla al terminar, ignoramos (el proceso se limpia solo en serverless)
     }
-    throw e;
   }
 }

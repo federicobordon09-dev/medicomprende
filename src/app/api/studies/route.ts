@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadPdf } from "@/lib/blob";
 import { extractTextFromPdf } from "@/lib/pdfExtractor";
-import { extractTextFromImage } from "@/lib/ocrExtractor";
 import { analyzeReport } from "@/lib/geminiClient";
 import { sha256 } from "@/lib/utils";
 
@@ -110,6 +109,7 @@ export async function POST(request: NextRequest) {
 
     if (isImage) {
       try {
+        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
         text = await extractTextFromImage(buffer);
         ocrApplied = true;
       } catch (e) {
@@ -121,13 +121,23 @@ export async function POST(request: NextRequest) {
     } else if (isPdfWithText) {
       try {
         text = await extractTextFromPdf(buffer);
-      } catch {
+      } catch (e) {
+        // OCR (Tesseract.js) no funciona en Vercel serverless.
+        // Si estamos en Vercel, damos un error claro sin intentar OCR.
+        if (process.env.VERCEL === "1") {
+          return NextResponse.json(
+            { error: "Este PDF no tiene texto seleccionable. En Vercel no podemos hacer OCR. Probá con un PDF que tenga texto seleccionable." },
+            { status: 400 }
+          );
+        }
+
         try {
+          const { extractTextFromImage } = await import("@/lib/ocrExtractor");
           text = await extractTextFromImage(buffer);
           ocrApplied = true;
-        } catch (e) {
+        } catch (ocrErr) {
           return NextResponse.json(
-            { error: e instanceof Error ? e.message : "No pudimos extraer texto del PDF. Probá con un PDF que tenga texto seleccionable." },
+            { error: ocrErr instanceof Error ? ocrErr.message : "No pudimos extraer texto del PDF. Probá con un PDF que tenga texto seleccionable." },
             { status: 400 }
           );
         }

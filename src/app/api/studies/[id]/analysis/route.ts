@@ -46,11 +46,16 @@ export async function POST(
     try {
       text = await extractTextFromPdf(buffer);
     } catch {
-      const { extractTextFromImage } = await import("@/lib/ocrExtractor");
+      // OCR no disponible en Vercel serverless - damos error claro sin intentar OCR
+      if (process.env.VERCEL === "1") {
+        throw new Error("Este PDF no tiene texto seleccionable. En Vercel no podemos hacer OCR. Probá con un PDF que tenga texto seleccionable.");
+      }
+
       try {
+        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
         text = await extractTextFromImage(buffer);
-      } catch {
-        throw new Error("No pudimos extraer texto del archivo. Probá con un PDF que tenga texto seleccionable.");
+      } catch (e) {
+        throw new Error(e instanceof Error ? e.message : "No pudimos extraer texto del archivo. Probá con un PDF que tenga texto seleccionable.");
       }
     }
 
