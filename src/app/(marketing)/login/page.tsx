@@ -280,7 +280,8 @@ function LoginForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <ForgotPasswordModal open={showForgot} onClose={() => setShowForgot(false)} />
+      <form id="login-form" onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-warm-700 mb-1.5">Email</label>
           <input
