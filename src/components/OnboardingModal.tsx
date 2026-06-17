@@ -48,7 +48,7 @@ export function OnboardingModal() {
         throw new Error(data.error || "Error al guardar");
       }
 
-      await update();
+      await update({ firstName: firstName.trim(), lastName: lastName.trim(), age: age ? Number(age) : null });
       setOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al guardar");
