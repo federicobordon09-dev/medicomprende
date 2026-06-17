@@ -40,12 +40,14 @@ function extractWithPdf2json(buffer: Buffer): Promise<string> {
   });
 }
 
-/** Extraer texto usando pdf-parse (mozilla pdf.js, más tolerante con formatos raros) */
+/** Extraer texto usando pdf-parse v2 (mozilla pdf.js, más tolerante con formatos raros) */
 async function extractWithPdfParse(buffer: Buffer): Promise<string> {
-  // pdf-parse usa import() dinámico interno con require — lo forzamos con import
-  const pdfParse = (await import("pdf-parse")).default;
-  const data = await pdfParse(buffer);
-  return data.text || "";
+  // pdf-parse v2 exporta PDFParse como clase (named export), no default
+  const { PDFParse } = await import("pdf-parse");
+  const pdf = new PDFParse(new Uint8Array(buffer));
+  const result = await pdf.getText();
+  await pdf.destroy();
+  return result.text || "";
 }
 
 /**
