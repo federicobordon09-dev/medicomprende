@@ -141,32 +141,45 @@ export async function analyzeReport(
     },
   });
 
-  let result;
-  try {
-    if (typeof textOrBuffer !== "string") {
-      // Modo archivo: mandamos el PDF/imagen directo a Gemini via inlineData.
-      // Gemini extrae el texto y lo analiza internamente.
-      result = await model.generateContent([
+  let rawText: string;
+  if (typeof textOrBuffer !== "string") {
+    // Modo archivo: intentamos mandar el PDF/imagen directo a Gemini via inlineData.
+    // Gemini intenta extraer el texto y analizarlo internamente.
+    // Si falla (PDFs no soportados inline por algunos modelos), hacemos fallback a texto extraído.
+    const base64Data = textOrBuffer.toString("base64");
+    try {
+      const result = await model.generateContent([
         {
           inlineData: {
             mimeType: mimeType || "application/pdf",
-            data: textOrBuffer.toString("base64"),
+            data: base64Data,
           },
         },
         { text: SYSTEM_PROMPT_V2 },
       ]);
-    } else {
-      // Modo texto legacy: mandamos el texto ya extraído
-      result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${textOrBuffer}`);
+      rawText = result.response.text();
+    } catch (inlineErr) {
+      // Si Gemini rechazó el archivo inline, intentamos extraer texto con pdf-parse
+      // y mandar el texto (funciona para cualquier PDF con texto seleccionable).
+      console.warn("Inline file submission failed, falling back to text extraction:", inlineErr instanceof Error ? inlineErr.message : inlineErr);
+      try {
+        const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
+        const extractedText = await extractTextFromPdf(textOrBuffer);
+        const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${extractedText}`);
+        rawText = result.response.text();
+      } catch (textErr) {
+        // Ambos métodos fallaron. Devolvemos el error del inline (más descriptivo)
+        if (inlineErr instanceof Error) {
+          throw new Error(`Gemini: ${inlineErr.message}`);
+        }
+        throw new Error("Error de conexión con la IA.");
+      }
     }
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(`Gemini: ${err.message}`);
-    }
-    throw new Error("Error de conexión con la IA.");
+  } else {
+    // Modo texto: mandamos el texto extraído directamente
+    const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${textOrBuffer}`);
+    rawText = result.response.text();
   }
-
-  const rawText = result.response.text();
 
   if (!rawText || rawText.trim().length === 0) {
     throw new Error("La IA no devolvió contenido. El informe podría estar vacío o ser ilegible.");

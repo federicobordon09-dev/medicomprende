@@ -39,9 +39,18 @@ export async function POST(
   try {
     const buffer = await readFileBuffer(study.fileUrl);
 
+    const effectiveMimeType = study.fileMimeType || "application/pdf";
+    const MAX_BYTES = 15 * 1024 * 1024;
+    if (buffer.length > MAX_BYTES) {
+      return NextResponse.json(
+        { error: `El archivo es demasiado grande para analizarlo (${(buffer.length / 1024 / 1024).toFixed(1)} MB). Máximo 15 MB.` },
+        { status: 400 }
+      );
+    }
+
     // Enviamos el archivo directo a Gemini (PDF o imagen).
     // Gemini extrae el texto Y lo analiza internamente - no necesita OCR ni extracción previa.
-    const result = await analyzeReport(buffer, study.fileMimeType);
+    const result = await analyzeReport(buffer, effectiveMimeType);
 
     if (study.analysis) {
       const updated = await prisma.analysis.update({
@@ -83,6 +92,46 @@ export async function POST(
     return NextResponse.json(analysis);
   } catch (error) {
     console.error("Re-analysis error:", error);
+    const message = error instanceof Error ? error.message : "";
+    // Devolvemos el error real de Gemini para que el usuario vea qué pasó
+    if (message.includes("Gemini:")) {
+      const geminiMsg = message.replace("Gemini:", "").trim();
+      if (geminiMsg.includes("API_KEY") || geminiMsg.includes("API key")) {
+        return NextResponse.json(
+          { error: "La API key de Gemini no está configurada correctamente." },
+          { status: 500 }
+        );
+      }
+      if (geminiMsg.includes("quota") || geminiMsg.includes("RATE_LIMIT") || geminiMsg.includes("429")) {
+        return NextResponse.json(
+          { error: "La IA está sobrecargada. Esperá un minuto e intentá de nuevo." },
+          { status: 429 }
+        );
+      }
+      if (geminiMsg.includes("SAFETY") || geminiMsg.includes("blocked")) {
+        return NextResponse.json(
+          { error: "La IA rechazó el archivo por políticas de seguridad. Probá con otro archivo." },
+          { status: 400 }
+        );
+      }
+      if (geminiMsg.includes("timed out") || geminiMsg.includes("timeout") || geminiMsg.includes("deadline")) {
+        return NextResponse.json(
+          { error: "La IA tardó demasiado en responder. Probá con un archivo más chico." },
+          { status: 504 }
+        );
+      }
+      if (geminiMsg.includes("fetch") || geminiMsg.includes("network") || geminiMsg.includes("ERR_")) {
+        return NextResponse.json(
+          { error: "Error de conexión con la IA. Verificá tu internet e intentá de nuevo." },
+          { status: 503 }
+        );
+      }
+      // Para otros errores de Gemini, devolvemos el mensaje real
+      return NextResponse.json({ error: geminiMsg }, { status: 500 });
+    }
+    if (message.includes("No pudimos extraer") || message.includes("selectable")) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
     return NextResponse.json(
       { error: "No pudimos analizar el estudio. Intentalo de nuevo." },
       { status: 500 }
