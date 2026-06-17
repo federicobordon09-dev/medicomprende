@@ -143,11 +143,11 @@ export default function UploadPage() {
       .then((data) => {
         if (Array.isArray(data)) {
           setProfiles(data);
-          if (data.length > 0 && !selectedProfile) setSelectedProfile(data[0].id);
+          if (data.length > 0) setSelectedProfile(data[0].id);
         }
       })
       .catch(() => {});
-  }, [selectedProfile]);
+  }, []);
 
   const handleFile = useCallback((f: File) => {
     const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
@@ -161,8 +161,8 @@ export default function UploadPage() {
     }
     setError("");
     setFile(f);
-    if (!title) setTitle(f.name.replace(/\.[^/.]+$/, ""));
-  }, [title]);
+    setTitle(f.name.replace(/\.[^/.]+$/, ""));
+  }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -257,16 +257,14 @@ export default function UploadPage() {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-warm-700 mb-1.5">Título (opcional)</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ej: Análisis de sangre marzo 2026"
-            className="w-full px-3.5 py-2 bg-white border border-azul-200 rounded-xl text-warm-900 text-sm placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500"
-          />
-        </div>
+        {title && (
+          <div>
+            <label className="block text-sm font-medium text-warm-700 mb-1.5">Título</label>
+            <p className="w-full px-3.5 py-2 bg-azul-50 border border-azul-200 rounded-xl text-warm-900 text-sm">
+              {title}
+            </p>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-warm-700 mb-1.5">Archivo</label>
