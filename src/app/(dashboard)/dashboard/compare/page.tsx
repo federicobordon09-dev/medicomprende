@@ -1,33 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useStudies } from "@/lib/api-hooks";
 import { StudyCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate } from "@/lib/utils";
-import type { StudyWithAnalysis } from "@/lib/types";
 
 export default function ComparePage() {
   const router = useRouter();
-  const [studies, setStudies] = useState<StudyWithAnalysis[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: studiesData, isLoading } = useStudies(50);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [comparing, setComparing] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("/api/studies?limit=50")
-      .then((res) => res.ok ? res.json() : [])
-      .then((data) => setStudies(data.studies || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+  const studies = studiesData?.studies || [];
 
-  const toggleStudy = (id: string) => {
+  const toggleStudy = useCallback((id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
-  };
+  }, []);
 
   const handleCompare = async () => {
     if (selectedIds.length < 2) return;
@@ -53,7 +46,7 @@ export default function ComparePage() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div className="space-y-3">{[1, 2, 3, 4].map((i) => <StudyCardSkeleton key={i} />)}</div>;
   }
 

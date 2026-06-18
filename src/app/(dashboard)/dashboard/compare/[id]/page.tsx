@@ -1,27 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useComparison } from "@/lib/api-hooks";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatDate } from "@/lib/utils";
-import type { ComparisonResult } from "@/lib/types";
 
 export default function CompareResultPage() {
   const params = useParams();
   const router = useRouter();
-  const [data, setData] = useState<ComparisonResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const id = params.id as string;
+  const { data, isLoading, error } = useComparison(id);
 
-  useEffect(() => {
-    fetch(`/api/compare/${params.id}`)
-      .then((res) => res.ok ? res.json() : Promise.reject())
-      .then((d) => setData(d))
-      .catch(() => setError("Error al cargar la comparación."))
-      .finally(() => setLoading(false));
-  }, [params.id]);
-
-  if (loading) {
+  if (isLoading) {
     return <div className="space-y-6 max-w-3xl mx-auto">
       <Skeleton className="h-8 w-48" />
       <Skeleton className="h-40 w-full" />
@@ -32,7 +22,7 @@ export default function CompareResultPage() {
   if (error || !data) {
     return (
       <div className="text-center py-16">
-        <p className="text-warm-600">{error || "Comparación no encontrada."}</p>
+        <p className="text-warm-600">{error instanceof Error ? error.message : "Comparación no encontrada."}</p>
         <button onClick={() => router.push("/dashboard/compare")} className="text-cta-500 font-medium mt-4">
           Volver a comparar
         </button>
@@ -64,7 +54,7 @@ export default function CompareResultPage() {
         <p className="text-azul-100 leading-relaxed">{data.summary}</p>
       </div>
 
-      {data.changes.length > 0 && (
+      {data.changes && data.changes.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md">
           <h3 className="font-display font-semibold text-lg text-warm-950 mb-4">Cambios detectados</h3>
           <div className="overflow-x-auto">
@@ -106,7 +96,7 @@ export default function CompareResultPage() {
         </div>
       )}
 
-      {data.trends.length > 0 && (
+      {data.trends && data.trends.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md">
           <h3 className="font-display font-semibold text-lg text-warm-950 mb-4">Tendencias</h3>
           <div className="space-y-4">
@@ -147,7 +137,7 @@ export default function CompareResultPage() {
         </div>
       )}
 
-      {data.recommendations.length > 0 && (
+      {data.recommendations && data.recommendations.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-cta-400">
           <h3 className="font-display font-semibold text-lg text-warm-950 mb-3">Recomendaciones</h3>
           <ul className="space-y-2">

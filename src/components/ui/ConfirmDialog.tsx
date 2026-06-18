@@ -24,13 +24,15 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const onCancelRef = useRef(onCancel);
+  onCancelRef.current = onCancel;
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onCancelRef.current(); };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [open, onCancel]);
+  }, [open]);
 
   useEffect(() => {
     if (open) dialogRef.current?.focus();

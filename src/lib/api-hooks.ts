@@ -16,6 +16,8 @@ export function useStudies(limit = 20) {
   return useQuery({
     queryKey: ["studies", limit],
     queryFn: () => fetchJson<{ studies: StudyWithAnalysis[]; total: number }>(`/api/studies?limit=${limit}`),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
   });
 }
 
@@ -24,6 +26,8 @@ export function useStudy(id: string) {
     queryKey: ["study", id],
     queryFn: () => fetchJson<StudyWithAnalysis>(`/api/studies/${id}`),
     enabled: !!id,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
   });
 }
 
@@ -31,6 +35,8 @@ export function useProfiles() {
   return useQuery({
     queryKey: ["profiles"],
     queryFn: () => fetchJson<{ id: string; name: string; color: string; relation: string }[]>("/api/profiles"),
+    staleTime: 5 * 60_000,
+    gcTime: 10 * 60_000,
   });
 }
 
@@ -38,6 +44,8 @@ export function useAlerts(acknowledged = false) {
   return useQuery({
     queryKey: ["alerts", acknowledged],
     queryFn: () => fetchJson<{ alerts: any[]; unreadCount: number }>(`/api/alerts?acknowledged=${acknowledged}`),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
   });
 }
 
@@ -46,6 +54,8 @@ export function useComparison(id: string) {
     queryKey: ["comparison", id],
     queryFn: () => fetchJson<ComparisonResult>(`/api/compare/${id}`),
     enabled: !!id,
+    staleTime: 60_000,
+    gcTime: 10 * 60_000,
   });
 }
 

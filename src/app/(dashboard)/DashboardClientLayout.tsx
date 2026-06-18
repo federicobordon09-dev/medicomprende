@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
@@ -9,9 +8,8 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { OnboardingModal } from "@/components/OnboardingModal";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   return (
-    <div key={pathname} className="page-enter">
+    <div className="page-enter">
       {children}
     </div>
   );

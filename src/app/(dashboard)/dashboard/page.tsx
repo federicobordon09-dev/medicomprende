@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useStudies, useAlerts, useDeleteStudy } from "@/lib/api-hooks";
@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { StudyCardSkeleton } from "@/components/ui/Skeleton";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatDate, formatFileSize } from "@/lib/utils";
-import type { OutOfRangeValue } from "@/lib/types";
+import type { OutOfRangeValue, StudyWithAnalysis } from "@/lib/types";
 
 function useCountUp(target: number, duration = 1200, delay = 0) {
   const [count, setCount] = useState(0);
@@ -17,16 +17,18 @@ function useCountUp(target: number, duration = 1200, delay = 0) {
 
   useEffect(() => {
     if (!started || target === 0) return;
+    let rafId: number;
     const startTime = performance.now() + delay;
     function update(now: number) {
-      if (now < startTime) { requestAnimationFrame(update); return; }
+      if (now < startTime) { rafId = requestAnimationFrame(update); return; }
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 4);
       setCount(Math.floor(target * eased));
-      if (progress < 1) requestAnimationFrame(update);
+      if (progress < 1) rafId = requestAnimationFrame(update);
     }
-    requestAnimationFrame(update);
+    rafId = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(rafId);
   }, [started, target, duration, delay]);
 
   useEffect(() => {
@@ -82,6 +84,78 @@ function StatCard({ value, label, sublabel, color }: { value: number; label: str
   );
 }
 
+const StudyListItem = memo(function StudyListItem({
+  study, index, onDeleteClick
+}: {
+  study: StudyWithAnalysis;
+  index: number;
+  onDeleteClick: (id: string | null) => void;
+}) {
+  const severityCount = study.analysis?.outOfRangeValues?.filter(
+    (v: OutOfRangeValue) => v.status !== "normal"
+  ).length || 0;
+
+  return (
+    <Link
+      href={`/dashboard/studies/${study.id}`}
+      className="block bg-white rounded-xl border border-azul-200/60 p-5 card-hover"
+      style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${index * 80}ms both` }}
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-azul-100 to-azul-200 flex items-center justify-center flex-shrink-0 text-azul-600">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-warm-950 truncate">
+            {study.title}
+          </p>
+          <p className="text-sm text-warm-600">
+            {study.studyType || "Estudio médico"} &middot; {formatDate(study.createdAt)} &middot; {formatFileSize(study.fileSize)}
+          </p>
+          {study.profile && (
+            <span className="inline-flex items-center gap-1.5 mt-1 text-xs text-warm-500">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: study.profile.color }} />
+              {study.profile.name}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {severityCount > 0 && (
+            <span className="inline-flex items-center gap-1 bg-cta-100 text-cta-700 text-xs font-medium px-2.5 py-1 rounded-full">
+              {severityCount} alerta{severityCount !== 1 ? "s" : ""}
+            </span>
+          )}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDeleteClick(study.id);
+            }}
+            className="p-1.5 rounded-lg text-warm-400 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+            title="Eliminar estudio"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+          </button>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform flex-shrink-0">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+      </div>
+      {study.analysis?.summary && (
+        <p className="mt-3 text-sm text-warm-700 line-clamp-2 pl-15">
+          {study.analysis.summary}
+        </p>
+      )}
+    </Link>
+  );
+});
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const { data: studiesData, isLoading: studiesLoading, error: studiesError } = useStudies(10);
@@ -93,14 +167,14 @@ export default function DashboardPage() {
   const studies = studiesData?.studies || [];
   const unreadAlerts = alertsData?.unreadCount || 0;
 
-  const handleDelete = async (studyId: string) => {
+  const handleDelete = useCallback(async (studyId: string) => {
     try {
       await deleteStudy.mutateAsync(studyId);
       setDeleteConfirm(null);
     } catch {
       // Error handled by React Query
     }
-  };
+  }, [deleteStudy]);
 
   const userName = session?.user?.name?.split(" ")[0] || "bienvenido";
 
@@ -187,72 +261,14 @@ export default function DashboardPage() {
         )}
 
         <div className="space-y-2">
-          {studies.map((study, i) => {
-            const severityCount = study.analysis?.outOfRangeValues?.filter(
-              (v: OutOfRangeValue) => v.status !== "normal"
-            ).length || 0;
-
-            return (
-              <Link
-                key={study.id}
-                href={`/dashboard/studies/${study.id}`}
-                className="block bg-white rounded-xl border border-azul-200/60 p-5 card-hover"
-                style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${i * 80}ms both` }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-azul-100 to-azul-200 flex items-center justify-center flex-shrink-0 text-azul-600">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-warm-950 truncate">
-                      {study.title}
-                    </p>
-                    <p className="text-sm text-warm-600">
-                      {study.studyType || "Estudio médico"} &middot; {formatDate(study.createdAt)} &middot; {formatFileSize(study.fileSize)}
-                    </p>
-                    {study.profile && (
-                      <span className="inline-flex items-center gap-1.5 mt-1 text-xs text-warm-500">
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: study.profile.color }} />
-                        {study.profile.name}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {severityCount > 0 && (
-                      <span className="inline-flex items-center gap-1 bg-cta-100 text-cta-700 text-xs font-medium px-2.5 py-1 rounded-full">
-                        {severityCount} alerta{severityCount !== 1 ? "s" : ""}
-                      </span>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setDeleteConfirm(study.id);
-                      }}
-                      className="p-1.5 rounded-lg text-warm-400 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
-                      title="Eliminar estudio"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                    </button>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform flex-shrink-0">
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </div>
-                </div>
-                {study.analysis?.summary && (
-                  <p className="mt-3 text-sm text-warm-700 line-clamp-2 pl-15">
-                    {study.analysis.summary}
-                  </p>
-                )}
-              </Link>
-            );
-          })}
+          {studies.map((study, i) => (
+            <StudyListItem
+              key={study.id}
+              study={study}
+              index={i}
+              onDeleteClick={setDeleteConfirm}
+            />
+          ))}
         </div>
       </section>
 
