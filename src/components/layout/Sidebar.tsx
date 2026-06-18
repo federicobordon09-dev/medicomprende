@@ -55,20 +55,30 @@ export function Sidebar() {
   return (
     <>
       <button
-        onClick={() => setMobileOpen(!mobileOpen)}
+        onClick={() => setMobileOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-azul-900 rounded-xl flex items-center justify-center text-white"
-        aria-label="Menú"
+        aria-label="Abrir menú"
+        style={{ display: mobileOpen ? "none" : undefined }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          {mobileOpen ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></> : <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>}
+          <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
         </svg>
       </button>
 
       <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-azul-950 text-white flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-        <div className="p-5 border-b border-white/10">
+        <div className="flex items-center justify-between p-5 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="font-display font-semibold text-lg">MediComprende</span>
           </Link>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="lg:hidden w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white flex-shrink-0"
+            aria-label="Cerrar menú"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">

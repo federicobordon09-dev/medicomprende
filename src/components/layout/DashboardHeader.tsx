@@ -17,7 +17,7 @@ export function DashboardHeader() {
   const title = Object.entries(PAGE_TITLES).find(([path]) => pathname.startsWith(path))?.[1] || "Dashboard";
 
   return (
-    <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-azul-200/60">
+    <header className="h-16 flex items-center justify-between pl-14 lg:pl-6 pr-6 bg-white border-b border-azul-200/60">
       <h1 className="font-display font-semibold text-lg text-warm-950">
         {title}
       </h1>
