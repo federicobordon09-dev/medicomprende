@@ -4,58 +4,81 @@ import { prisma } from "@/lib/prisma";
 import { compareStudies } from "@/lib/geminiCompare";
 import type { Study } from "@prisma/client";
 
-const COMPARABLE_GROUPS: Record<string, string[]> = {
-  lab: ["sangre", "laboratorio"],
-  imaging: ["resonancia", "tomografia", "radiografia", "ecografia", "mamografia"],
-  ecg: ["electrocardiograma"],
-  epicrisis: ["epicrisis"],
-  other: ["otro"],
+const STUDY_GROUPS: Record<string, { label: string; description: string; types: string[] }> = {
+  lab: {
+    label: "análisis de laboratorio",
+    description: "parámetros bioquímicos (glucosa, colesterol, etc.)",
+    types: ["sangre", "laboratorio"],
+  },
+  imaging: {
+    label: "estudios por imágenes",
+    description: "imágenes anatómicas (estructuras, tejidos, órganos)",
+    types: ["resonancia", "tomografia", "radiografia", "ecografia", "mamografia"],
+  },
+  ecg: {
+    label: "electrocardiogramas",
+    description: "actividad eléctrica del corazón",
+    types: ["electrocardiograma"],
+  },
+  epicrisis: {
+    label: "epicrisis",
+    description: "resúmenes clínicos y evolución del paciente",
+    types: ["epicrisis"],
+  },
+  other: {
+    label: "estudios médicos",
+    description: "información médica general",
+    types: ["otro"],
+  },
 };
 
-function getGroupLabel(types: string[]): string {
-  for (const [group, values] of Object.entries(COMPARABLE_GROUPS)) {
-    if (types.some((t) => values.includes(t))) return group;
+const TYPE_LABELS: Record<string, string> = {
+  sangre: "análisis de sangre",
+  laboratorio: "análisis de laboratorio",
+  resonancia: "resonancia magnética",
+  tomografia: "tomografía",
+  radiografia: "radiografía",
+  ecografia: "ecografía",
+  mamografia: "mamografía",
+  electrocardiograma: "electrocardiograma",
+  epicrisis: "epicrisis",
+  otro: "estudio",
+};
+
+function getStudyGroup(type: string): string {
+  for (const [group, config] of Object.entries(STUDY_GROUPS)) {
+    if (config.types.includes(type)) return group;
   }
   return "other";
 }
 
-function getLabel(type: string): string {
-  const labels: Record<string, string> = {
-    sangre: "análisis de sangre",
-    laboratorio: "análisis de laboratorio",
-    resonancia: "resonancia magnética",
-    tomografia: "tomografía",
-    radiografia: "radiografía",
-    ecografia: "ecografía",
-    mamografia: "mamografía",
-    electrocardiograma: "electrocardiograma",
-    epicrisis: "epicrisis",
-    otro: "estudio médico",
-  };
-  return labels[type] || "estudio médico";
-}
-
-function getGroupName(group: string): string {
-  const names: Record<string, string> = {
-    lab: "análisis de laboratorio",
-    imaging: "estudios por imágenes",
-    ecg: "electrocardiogramas",
-    epicrisis: "epicrisis",
-    other: "estudios médicos",
-  };
-  return names[group] || "estudios médicos";
+function getTypeLabel(type: string): string {
+  return TYPE_LABELS[type] || `estudio de tipo "${type}"`;
 }
 
 function checkCompatibility(analyses: Array<{ study: Pick<Study, "title" | "studyType"> }>): string | null {
   const types = analyses.map((a) => a.study.studyType || "otro");
-  const groups = [...new Set(types.map((t) => getGroupLabel([t])))];
+  const groups = [...new Set(types.map(getStudyGroup))];
 
   if (groups.length <= 1) return null;
 
-  const typeDetails = types.map((t) => `"${getLabel(t)}"`).join(" y ");
-  const groupNames = groups.map((g) => getGroupName(g)).join(" con ");
+  const groupDescriptions: string[] = [];
+  for (const type of types) {
+    const group = getStudyGroup(type);
+    const config = STUDY_GROUPS[group];
+    if (config) {
+      groupDescriptions.push(`"${getTypeLabel(type)}" (mide ${config.description})`);
+    }
+  }
 
-  return `No se pueden comparar ${typeDetails}. Los ${groupNames} miden parámetros distintos y no tienen métricas en común para establecer una comparación válida. Seleccioná estudios del mismo tipo (por ejemplo, dos análisis de laboratorio o dos estudios por imágenes).`;
+  const uniqueDescriptions = [...new Set(groupDescriptions)];
+
+  return [
+    `No se pueden comparar los estudios seleccionados porque son de tipos distintos:`,
+    ...uniqueDescriptions.map((d) => `  • ${d}`),
+    ``,
+    `Cada tipo de estudio analiza aspectos diferentes del organismo y no comparten métricas comparables. Seleccioná dos o más estudios del mismo tipo (por ejemplo, dos análisis de sangre o dos resonancias) para obtener una comparación válida.`,
+  ].join("\n");
 }
 
 export async function POST(request: NextRequest) {
