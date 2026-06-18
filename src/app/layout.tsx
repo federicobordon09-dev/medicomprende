@@ -3,6 +3,7 @@ import { Figtree, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import "aos/dist/aos.css";
 import { SessionProvider } from "next-auth/react";
+import { QueryProvider } from "@/lib/query-provider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { site } from "@/data/contenido";
 
@@ -77,9 +78,11 @@ export default function RootLayout({
     <html lang="es" className={`${figtree.variable} ${notoSans.variable}`}>
       <body className="font-body text-warm-950 bg-sk-50 antialiased">
         <SessionProvider>
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
+          <QueryProvider>
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>

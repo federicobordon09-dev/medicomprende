@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest } from "next/server";
+import { requireAuth, apiSuccess, apiError } from "@/lib/api-response";
+import { ValidationError } from "@/lib/api-error";
 import nodemailer from "nodemailer";
 
 function createTransport() {
@@ -19,25 +20,22 @@ function createTransport() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
   try {
+    const session = await requireAuth();
+
     const body = await request.json();
     const { type, message, contact } = body;
 
     if (!type || !message || typeof message !== "string") {
-      return NextResponse.json({ error: "Completá todos los campos requeridos." }, { status: 400 });
+      throw new ValidationError("Completá todos los campos requeridos.");
     }
 
     if (!["Sugerencia", "Reportar error"].includes(type)) {
-      return NextResponse.json({ error: "Tipo de mensaje inválido." }, { status: 400 });
+      throw new ValidationError("Tipo de mensaje inválido.");
     }
 
     if (message.trim().length < 10) {
-      return NextResponse.json({ error: "El mensaje debe tener al menos 10 caracteres." }, { status: 400 });
+      throw new ValidationError("El mensaje debe tener al menos 10 caracteres.");
     }
 
     const transport = createTransport();
@@ -64,15 +62,10 @@ export async function POST(request: NextRequest) {
       console.log("Type:", type);
       console.log("Message:", message);
       console.log("Contact:", contact);
-      console.log("======================================");
     }
 
-    return NextResponse.json({ success: true });
+    return apiSuccess({ success: true });
   } catch (error) {
-    console.error("Feedback error:", error);
-    return NextResponse.json(
-      { error: "Error al enviar tu mensaje. Intentalo de nuevo." },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }
