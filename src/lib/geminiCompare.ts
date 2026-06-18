@@ -13,27 +13,86 @@ function getClient(): GoogleGenerativeAI {
   return genAI;
 }
 
+function normalizeChange(value: unknown): string {
+  const map: Record<string, string> = {
+    "aumento": "aumentó",
+    "aumenta": "aumentó",
+    "subió": "aumentó",
+    "subio": "aumentó",
+    "incrementó": "aumentó",
+    "incremento": "aumentó",
+    "disminuyo": "disminuyó",
+    "disminuye": "disminuyó",
+    "bajó": "disminuyó",
+    "bajo": "disminuyó",
+    "descendió": "disminuyó",
+    "descendio": "disminuyó",
+    "redujo": "disminuyó",
+    "se mantiene": "se mantuvo",
+    "se mantuvo": "se mantuvo",
+    "sin cambios": "se mantuvo",
+    "estable": "se mantuvo",
+    "igual": "se mantuvo",
+  };
+  if (typeof value !== "string") return "se mantuvo";
+  return map[value.toLowerCase().trim()] || value;
+}
+
+function normalizeSignificance(value: unknown): string {
+  const map: Record<string, string> = {
+    "mejora": "mejora",
+    "mejoró": "mejora",
+    "mejoro": "mejora",
+    "mejor": "mejora",
+    "empeoramiento": "empeoramiento",
+    "empeoró": "empeoramiento",
+    "empeoro": "empeoramiento",
+    "peor": "empeoramiento",
+    "estable": "estable",
+    "sin cambio": "estable",
+    "sin cambios": "estable",
+  };
+  if (typeof value !== "string") return "estable";
+  return map[value.toLowerCase().trim()] || value;
+}
+
+function normalizeTrend(value: unknown): string {
+  const map: Record<string, string> = {
+    "mejorando": "mejorando",
+    "mejora": "mejorando",
+    "mejor": "mejorando",
+    "empeorando": "empeorando",
+    "empeora": "empeorando",
+    "peor": "empeorando",
+    "estable": "estable",
+    "sin cambios": "estable",
+    "sin cambio": "estable",
+  };
+  if (typeof value !== "string") return "estable";
+  return map[value.toLowerCase().trim()] || value;
+}
+
 const ChangeSchema = z.object({
-  parameter: z.string().min(1),
-  previousValue: z.string().min(1),
-  currentValue: z.string().min(1),
-  change: z.enum(["aumentó", "disminuyó", "se mantuvo"]),
-  significance: z.enum(["mejora", "empeoramiento", "estable"]),
-  explanation: z.string().min(1),
+  parameter: z.string().min(1).catch(""),
+  previousValue: z.string().min(1).catch(""),
+  currentValue: z.string().min(1).catch(""),
+  change: z.preprocess(normalizeChange, z.enum(["aumentó", "disminuyó", "se mantuvo"])).catch("se mantuvo"),
+  significance: z.preprocess(normalizeSignificance, z.enum(["mejora", "empeoramiento", "estable"])).catch("estable"),
+  explanation: z.string().min(1).catch(""),
 });
 
 const TrendSchema = z.object({
-  parameter: z.string().min(1),
-  values: z.array(z.string()),
-  trend: z.enum(["mejorando", "empeorando", "estable"]),
+  parameter: z.string().min(1).catch(""),
+  values: z.array(z.string()).default([]),
+  trend: z.preprocess(normalizeTrend, z.enum(["mejorando", "empeorando", "estable"])).catch("estable"),
   warning: z.string().nullable().optional(),
 });
 
 const ComparisonResultSchema = z.object({
-  summary: z.string().min(1),
+  summary: z.string().min(1).catch(""),
   changes: z.array(ChangeSchema).default([]),
   trends: z.array(TrendSchema).default([]),
-  overallAssessment: z.string().min(1),
+  overallAssessment: z.string().min(1).catch(""),
   recommendations: z.array(z.string()).default([]),
   suggestedQuestions: z.array(z.string()).default([]),
 });
@@ -70,6 +129,26 @@ Estructura exacta:
   "suggestedQuestions": ["Pregunta 1", "Pregunta 2"]
 }
 
+╔══════════════════════════════════════════════════════════════════════╗
+║  VALORES EXACTOS — Usá SOLO estos, sin variaciones, sin tildes      ║
+║  faltantes, sin sinónimos. Copialos textual.                        ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+Campo "change" (solo estos 3 valores exactos):
+  → "aumentó"   (no "aumento", no "subió", no "incrementó")
+  → "disminuyó" (no "disminuyo", no "bajó", no "descendió")
+  → "se mantuvo" (no "se mantiene", no "estable", no "sin cambios")
+
+Campo "significance" (solo estos 3 valores exactos):
+  → "mejora"
+  → "empeoramiento"
+  → "estable"
+
+Campo "trend" (solo estos 3 valores exactos):
+  → "mejorando"
+  → "empeorando"
+  → "estable"
+
 IMPORTANTE:
 - No inventes información que no esté en los análisis proporcionados.
 - No des diagnósticos ni recomendaciones médicas específicas.
@@ -83,7 +162,7 @@ export async function compareStudies(analysesText: string): Promise<ComparisonRe
   const client = getClient();
   const model = client.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
-    generationConfig: { temperature: 0.3, maxOutputTokens: 8192 },
+    generationConfig: { temperature: 0.15, maxOutputTokens: 16384 },
   });
 
   const prompt = `${COMPARE_PROMPT}\n\n---\n\nAnálisis de estudios a comparar:\n${analysesText}`;
@@ -138,6 +217,42 @@ export async function compareStudies(analysesText: string): Promise<ComparisonRe
     }
   }
 
-  const validated = ComparisonResultSchema.parse(parsed);
-  return validated;
+  function sanitizeComparisonResponse(data: unknown): unknown {
+    if (!data || typeof data !== "object" || Array.isArray(data)) return data;
+    const obj = { ...(data as Record<string, unknown>) };
+
+    const arrayFields: Record<string, string[]> = {
+      changes: ["parameter", "change"],
+      trends: ["parameter", "trend"],
+    };
+
+    for (const [key, requiredFields] of Object.entries(arrayFields)) {
+      if (!Array.isArray(obj[key])) continue;
+      const before = (obj[key] as unknown[]).length;
+      obj[key] = (obj[key] as unknown[]).filter((item) => {
+        if (!item || typeof item !== "object") return false;
+        return requiredFields.every((f) => {
+          const v = (item as Record<string, unknown>)[f];
+          return typeof v === "string" && v.trim().length > 0;
+        });
+      });
+      const after = (obj[key] as unknown[]).length;
+      if (after < before) {
+        console.warn(`[Gemini] Filtrados ${before - after} item(s) inválidos en comparación`);
+      }
+    }
+
+    return obj;
+  }
+
+  parsed = sanitizeComparisonResponse(parsed);
+
+  const validation = ComparisonResultSchema.safeParse(parsed);
+
+  if (!validation.success) {
+    console.error("Comparison validation error:", validation.error.flatten());
+    throw new Error("La IA devolvió una respuesta con formato incorrecto. Intentalo de nuevo.");
+  }
+
+  return validation.data;
 }
