@@ -67,20 +67,20 @@ Estructura exacta requerida:
   "outOfRangeValues": [
     {
       "parameter": "Nombre del parámetro o indicador",
-      "value": "Valor reportado en el informe",
-      "referenceRange": "Rango de referencia normal indicado en el informe",
+      "value": "Valor reportado en el informe (incluí la unidad de medida, ej: '165 mg/dL')",
+      "referenceRange": "Rango de referencia normal indicado en el informe (ej: '70-100 mg/dL' o '< 150 mg/dL'). Si no aparece, poné 'No especificado'",
       "status": "elevado" | "disminuido" | "borderline" | "normal",
-      "explanation": "Qué significa este valor en palabras simples"
+      "explanation": "Qué significa este valor específico en palabras simples. Explicá si está dentro, arriba o abajo del rango normal y qué implicancia tiene"
     }
   ],
   "parameterExplanations": [
     {
       "parameter": "Nombre del parámetro",
-      "value": "Valor reportado",
-      "explanation": "Qué mide este parámetro, qué significa su valor específico (ej: 'Tus triglicéridos están en 165, apenas sobre el límite de 150') y por qué es importante",
+      "value": "Valor reportado (incluí unidad de medida)",
+      "explanation": "Explicación COMPLETA: qué mide este parámetro, qué significa su valor específico en el contexto del paciente (ej: 'Tus triglicéridos están en 165, apenas sobre el límite de 150 mg/dL, lo que se considera borderline alto') y por qué es importante controlarlo",
       "possibleCauses": [
-        "Causa 1: extraída del texto del informe o asociación médica directa y conocida para este parámetro (ej: 'HbA1c elevada → prediabetes o diabetes')",
-        "Causa 2: si el informe no menciona causas, asociá la causa clínica más DIRECTA y ESPECÍFICA para ese parámetro (ej: 'Ferritina baja → anemia ferropénica', no 'dieta' genérica)"
+        "Causa 1 concreta (ej: 'Niveles elevados de LDL pueden indicar hipercolesterolemia, una condición que aumenta el riesgo cardiovascular')",
+        "Causa 2 si aplica"
       ]
     }
   ],
@@ -110,6 +110,21 @@ Estructura exacta requerida:
   ]
 }
 
+REGLAS CRÍTICAS PARA "outOfRangeValues":
+- Este array es el MÁS IMPORTANTE del análisis. Debe estar COMPLETO.
+- Si el informe es de LABORATORIO (análisis de sangre, orina, etc.), TODOS los parámetros con su valor y rango de referencia deben aparecer acá. NO omitas ninguno.
+- Incluí TAMBIÉN los valores que están dentro del rango normal (status: "normal"), el usuario necesita verlos todos.
+- Buscá en el texto del informe cualquier tabla, lista, o sección que contenga resultados numéricos con rangos de referencia.
+- Cada fila de una tabla de laboratorio = un item en outOfRangeValues.
+- Si un parámetro tiene una marca como "H" (high), "L" (low), "↑", "↓", "*" o "ALTO/BAJO", usalo para determinar el status.
+- Si el valor está dentro del rango pero muy cercano al límite, usá "borderline".
+
+REGLAS CRÍTICAS PARA "parameterExplanations":
+- Este array debe tener UN item por CADA parámetro en outOfRangeValues. Deben coincidir en cantidad y nombre de parámetros.
+- Cada parameterExplanation debe explicar: 1) qué mide el parámetro, 2) qué significa el valor específico, 3) por qué es relevante para la salud.
+- Para parámetros con status "elevado" o "disminuido", la explicación debe ser más detallada.
+- Para parámetros con status "normal", una explicación breve alcanza: "Tus valores de glucosa están dentro del rango normal, lo que indica un buen control metabólico".
+
 IMPORTANTE:
 - No inventes información que no esté en el texto del informe.
 - Si algo no está claro o no se entiende, decilo honestamente.
@@ -118,17 +133,27 @@ IMPORTANTE:
 - Usá "vos" y "tenés" (español rioplatense con voseo).
 - Si el informe no tiene hallazgos relevantes, indicá que está dentro de parámetros normales.
 - Siempre aclará que la información es educativa.
-- MANTENÉ LA RESPUESTA CORTA y CONCISA. No uses más de 4000 caracteres.
+- MANTENÉ LA RESPUESTA CORTA y CONCISA. No uses más de 5000 caracteres.
 - El JSON debe estar COMPLETO y BIEN FORMADO. No cortes strings con saltos de línea ni dejes objetos/arrays sin cerrar.
 
-REGLAS PARA "possibleCauses":
+REGLAS PARA "possibleCauses" (tanto en parameterExplanations como en el array general):
 - Las causas deben ser CONCRETAS y ESPECÍFICAS, no genéricas.
-- Priodad 1: extraé la causa del texto del informe si está mencionada.
+- Prioridad 1: extraé la causa del texto del informe si está mencionada.
 - Prioridad 2: si el informe no menciona la causa, usá la asociación clínica DIRECTA para ese parámetro (ej: "HbA1c elevada → prediabetes", "LDL alto → hipercolesterolemia", "TSH baja + T4 alta → hipertiroidismo", "ferritina baja → anemia ferropénica").
 - NUNCA uses causas genéricas como "dieta", "estilo de vida", "genética", "factores genéticos", "falta de ejercicio", "herencia" o "sedentarismo" como único contenido. Si el informe no da información, priorizá la causa clínica directa.
 - Ejemplo correcto: ["Prediabetes (resistencia a la insulina)"], no ["Dieta", "Falta de ejercicio"].
 - Si de verdad no hay suficiente información para asociar una causa clínica directa, poné: ["No especificado en el informe"].
-- Como máximo 2 causas por parámetro.`;
+- Como máximo 2 causas por parámetro.
+
+EJEMPLO DE EXTRACCIÓN CORRECTA:
+Informe: "Glucosa: 110 mg/dL (VR: 70-100) ↑ | Colesterol total: 220 mg/dL (VR: <200) H | HDL: 45 mg/dL (VR: >40)"
+Salida esperada:
+"outOfRangeValues": [
+  { "parameter": "Glucosa", "value": "110 mg/dL", "referenceRange": "70-100 mg/dL", "status": "elevado", "explanation": "Tu glucosa está levemente por arriba del rango normal, lo que puede indicar prediabetes o intolerancia a la glucosa" },
+  { "parameter": "Colesterol total", "value": "220 mg/dL", "referenceRange": "< 200 mg/dL", "status": "elevado", "explanation": "Tu colesterol total está por encima del nivel recomendado, lo que puede aumentar el riesgo cardiovascular" },
+  { "parameter": "HDL", "value": "45 mg/dL", "referenceRange": "> 40 mg/dL", "status": "normal", "explanation": "Tu colesterol HDL está dentro del rango normal, lo cual es bueno porque el HDL protege tu corazón" }
+]
+`;
 
 /**
  * Analiza un estudio médico con Gemini.
@@ -147,9 +172,9 @@ export async function analyzeReport(
   const model = client.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
     generationConfig: {
-      temperature: 0.3,
-      topP: 0.9,
-      maxOutputTokens: 8192,
+      temperature: 0.2,
+      topP: 0.95,
+      maxOutputTokens: 16384,
     },
   });
 
