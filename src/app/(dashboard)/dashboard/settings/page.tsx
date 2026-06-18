@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [deletingStudies, setDeletingStudies] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [confirmStudies, setConfirmStudies] = useState(false);
@@ -23,6 +25,8 @@ export default function SettingsPage() {
         const err = await res.json().catch(() => ({ error: "Error" }));
         throw new Error(err.error || "Error al eliminar");
       }
+      queryClient.invalidateQueries({ queryKey: ["studies"] });
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
       setConfirmStudies(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al eliminar estudios");
