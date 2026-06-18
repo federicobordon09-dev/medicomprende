@@ -1,6 +1,5 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -24,24 +23,22 @@ export default function DashboardClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
-      <AuthGuard>
-        <ToastProvider>
-          <OnboardingModal />
-          <div className="h-dvh bg-azul-50 flex overflow-hidden">
-            <Sidebar />
-            <div className="flex-1 flex flex-col min-w-0">
-              <DashboardHeader />
-              <main className="flex-1 overflow-auto p-4 md:p-5 lg:p-6">
-                <PageTransition>
-                  {children}
-                </PageTransition>
-            </main>
-          </div>
+    <AuthGuard>
+      <ToastProvider>
+        <OnboardingModal />
+        <div className="h-dvh bg-azul-50 flex overflow-hidden">
+          <Sidebar />
+          <div className="flex-1 flex flex-col min-w-0">
+            <DashboardHeader />
+            <main className="flex-1 overflow-auto p-4 md:p-5 lg:p-6">
+              <PageTransition>
+                {children}
+              </PageTransition>
+          </main>
         </div>
-        <FeedbackWidget />
-      </ToastProvider>
-      </AuthGuard>
-    </SessionProvider>
+      </div>
+      <FeedbackWidget />
+    </ToastProvider>
+    </AuthGuard>
   );
 }

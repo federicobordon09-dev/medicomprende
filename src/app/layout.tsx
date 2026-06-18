@@ -3,8 +3,6 @@ import { Figtree, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import "aos/dist/aos.css";
 import { SessionProvider } from "next-auth/react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { site } from "@/data/contenido";
 
@@ -78,17 +76,9 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${figtree.variable} ${notoSans.variable}`}>
       <body className="font-body text-warm-950 bg-sk-50 antialiased">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-sk-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg"
-        >
-          Saltar al contenido principal
-        </a>
         <SessionProvider>
           <ErrorBoundary>
-            <Navbar />
-            <main id="main-content">{children}</main>
-            <Footer />
+            {children}
           </ErrorBoundary>
         </SessionProvider>
       </body>
