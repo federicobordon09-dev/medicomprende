@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useStudies, useAlerts, useDeleteStudy } from "@/lib/api-hooks";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StudyCardSkeleton } from "@/components/ui/Skeleton";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatDate, formatFileSize } from "@/lib/utils";
-import type { StudyWithAnalysis, OutOfRangeValue } from "@/lib/types";
+import type { OutOfRangeValue } from "@/lib/types";
 
 function useCountUp(target: number, duration = 1200, delay = 0) {
   const [count, setCount] = useState(0);
@@ -84,52 +84,21 @@ function StatCard({ value, label, sublabel, color }: { value: number; label: str
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const router = useRouter();
-  const [studies, setStudies] = useState<StudyWithAnalysis[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [unreadAlerts, setUnreadAlerts] = useState(0);
-  const [error, setError] = useState("");
+  const { data: studiesData, isLoading: studiesLoading, error: studiesError } = useStudies(10);
+  const { data: alertsData } = useAlerts(false);
+  const deleteStudy = useDeleteStudy();
+
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [studiesRes, alertsRes] = await Promise.all([
-          fetch("/api/studies?limit=10"),
-          fetch("/api/alerts?acknowledged=false&limit=1"),
-        ]);
-
-        if (studiesRes.ok) {
-          const data = await studiesRes.json();
-          setStudies(data.studies || []);
-        }
-
-        if (alertsRes.ok) {
-          const data = await alertsRes.json();
-          setUnreadAlerts(data.unreadCount || 0);
-        }
-      } catch {
-        setError("Error al cargar los datos.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  const studies = studiesData?.studies || [];
+  const unreadAlerts = alertsData?.unreadCount || 0;
 
   const handleDelete = async (studyId: string) => {
-    if (deleting) return;
-    setDeleting(true);
     try {
-      const res = await fetch(`/api/studies/${studyId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
-      setStudies((prev) => prev.filter((s) => s.id !== studyId));
-    } catch {
-      setError("No se pudo eliminar el estudio.");
-    } finally {
-      setDeleting(false);
+      await deleteStudy.mutateAsync(studyId);
       setDeleteConfirm(null);
+    } catch {
+      // Error handled by React Query
     }
   };
 
@@ -140,7 +109,7 @@ export default function DashboardPage() {
     0
   );
 
-  if (loading) {
+  if (studiesLoading) {
     return (
       <div className="page-enter space-y-6">
         <div className="h-8 w-48 skeleton-shimmer rounded-lg" />
@@ -170,9 +139,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {error && (
+      {studiesError && (
         <div className="bg-cta-50 border border-cta-200 rounded-xl px-4 py-3 text-sm text-cta-700">
-          {error}
+          {studiesError.message}
         </div>
       )}
 
