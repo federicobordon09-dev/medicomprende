@@ -12,43 +12,50 @@ Cuenta con un modelo **freemium**: plan Gratuito con límites mensuales y plan *
 
 - **Autenticación** con Google OAuth via NextAuth v5
 - **Dashboard** con cards de resumen, estudios recientes y alertas inteligentes
-- **Subida de estudios** (PDF con texto seleccionable, hasta 10 MB)
+- **Subida de estudios** (PDF con texto seleccionable, hasta 15 MB)
 - **Análisis con IA** usando Google Gemini — resumen, hallazgos, términos médicos, valores fuera de rango, interpretación general, recomendaciones y preguntas sugeridas
 - **Prompt adaptativo por tipo de informe** — laboratorio (tablas numéricas), imágenes (hallazgos descriptivos), epicrisis (resumen clínico), ECG (mediciones eléctricas)
 - **Comparación entre estudios** — seleccioná 2+ estudios y compará cambios con validación de compatibilidad
 - **Alertas inteligentes** — detección automática de cambios significativos entre estudios con generación por IA
-- **Perfiles familiares** — múltiples perfiles para distintos miembros de la familia
-- **Chat contextual** — conversación con la IA sobre tus estudios con datos en contexto
+- **Perfiles familiares** — múltiples perfiles con límite según plan (1 gratis, ilimitado Pro)
+- **Chat con Doctor IA** — página dedicada (`/dashboard/chat`) + componente flotante en detalle de estudio:
+  - Selector de estudios guardados para elegir sobre qué hablar
+  - Preguntas sugeridas clickeables al seleccionar un estudio
+  - Animación de typing fluida con `framer-motion`
+  - Disclaimer médico siempre visible
+  - Exclusivo Pro (gratis ve upgrade card)
 - **Widget de feedback** — botón flotante para enviar ideas, bugs o sugerencias
 - **Tono argentino (voseo)** — todo el análisis usa "vos", "tenés" y español rioplatense
 - **Pagos con Mercado Pago (Checkout Pro)** — preferencias de pago, webhooks IPN, upsert de suscripciones en DB
-- **Modelo freemium** — plan Gratuito (2 análisis/mes, 1 comparación/mes, 5 estudios guardados) vs Pro ($3.000 ARS/mes, ilimitado)
-- **Exportación de análisis en PDF** — gated detrás del plan Pro, generado con PDFKit
+- **Modelo freemium** — plan Gratuito (3 análisis/mes, 2 comparaciones/mes, 10 estudios guardados, 1 perfil) vs Pro ($3.000 ARS/mes, ilimitado)
+- **Exportación de análisis en PDF** — gated detrás del plan Pro, generado con `pdf-lib` (soluciona error ENOENT en Vercel)
 - **Modelo de IA por plan** — `gemini-2.5-flash-lite` (Gratuito) / `gemini-2.5-flash` (Pro)
 - **Página de precios** (`/pricing`) con cards comparativas
 - **Badge de plan** en la Sidebar (PRO / GRATIS)
 - **Banner de upgrade** cuando el usuario está cerca del límite gratuito
-- **Gestión de suscripción** en Configuración — upgrade, cancelación, ver uso del mes
+- **Gestión de suscripción** en Configuración — upgrade, cancelación, ver uso del mes + banner de éxito post-pago con polling
 - **Webhook de Mercado Pago** — actualiza estado de suscripción al recibir `payment.approved`
 - **Fallback de búsqueda de usuario en webhook** — por `external_reference`, `preference_id` y `mpSubscriptionId`
 - **Eliminación masiva** — botón "Eliminar todos los estudios" en Configuración
 - **Optimizaciones de rendimiento** — React Query con `staleTime`/`gcTime`, `React.memo`, `useCallback`
 
+### 🔧 Fixes aplicados
+
+- **Manejo de errores 503 de Gemini** — detectado en todas las rutas (chat, comparación, análisis, re-análisis) con mensajes user-friendly en español. Incluye detección por `error.status` y `error.message`.
+- **Límite de perfiles familiares** — gratis: 1 perfil (antes permitía 5 a todos). Implementado `canCreateProfile()` con `MAX_PROFILES: 1`.
+- **Chat API con requireSubscription** — el endpoint `/api/chat` rechaza usuarios gratis con 403 y mensaje claro de upgrade.
+- **PDF export con pdf-lib** — reemplazó PDFKit que causaba `ENOENT: Helvetica.afm` en Vercel. `pdf-lib` incluye fuentes estándar embebidas.
+- **FOUC en dashboard** — fix de flash de estilos sin aplicar: `PageTransition` se monta solo después del mount.
+- **Estilos unificados login/register** — ambas páginas ahora comparten el mismo diseño premium.
+- **Creación de estudio post-verificación** — antes el estudio se creaba en DB antes de chequear límites mensuales; ahora se verifica primero.
+- **Contadores mensuales persistentes** — `analysesCount` y `comparisonsCount` en tabla `UsageLimit` con campo `month`. No se resetean al borrar estudios.
+- **Payment redirect fix** — `NEXT_PUBLIC_SITE_URL` forzado a URL de producción, sin fallback a `VERCEL_URL`.
+
 ### 📋 Pendientes / Próximas tareas
 
-1. **Fix redirect post-pago** — Al volver de Mercado Pago, el usuario se redirige a una URL de preview de Vercel en vez de al dominio de producción, perdiendo la sesión. Ya se seteó `NEXT_PUBLIC_SITE_URL` en Vercel; falta que el usuario haga un nuevo pago para que tome la URL correcta. También agregar banner de éxito al detectar `?payment=success` y polling de suscripción hasta que se active.
-
-2. **Chat contextual con IA — mejorar** — El chat ya existe pero hay que pulirlo: mejor UI, historial de mensajes persistente, límite de mensajes en plan gratuito.
-
-3. **Exportación PDF — formato imprimible** — Mejorar el PDF actual: agregar número de página, header/footer con logo, mejor tipografía y espaciado, disclaimer más visible para que sea apto para impresión.
-
-4. **Onboarding de nuevo usuario** — Tutorial interactivo al primer ingreso.
-
-5. **Modo oscuro** — Toggle de tema claro/oscuro.
-
-6. **Tests** — Agregar tests unitarios e integración para flujo de pagos, webhooks y límites de uso.
-
-7. **Manejo de Gemini API Free Tier** — La cuenta gratuita de Gemini tiene límite de 20 requests/día. Mejorar el manejo de errores cuando se excede el límite.
+1. **Onboarding de nuevo usuario** — Tutorial interactivo al primer ingreso.
+2. **Modo oscuro** — Toggle de tema claro/oscuro.
+3. **Tests** — Agregar tests unitarios e integración para flujo de pagos, webhooks y límites de uso.
 
 ## Tecnología
 
@@ -60,7 +67,7 @@ Cuenta con un modelo **freemium**: plan Gratuito con límites mensuales y plan *
 - **Pagos:** Mercado Pago Checkout Pro (vía REST API con `fetch`)
 - **Estado del cliente:** TanStack Query v5 (React Query)
 - **PDF (lectura):** pdf-parse v2 (Mozilla pdf.js)
-- **PDF (generación):** PDFKit
+- **PDF (generación):** pdf-lib
 - **Autenticación:** NextAuth v5 (Auth.js) con Prisma adapter
 - **Email:** Nodemailer + Gmail SMTP
 - **Almacenamiento:** `public/uploads/` (local)
@@ -194,7 +201,7 @@ El proyecto está deployado en Vercel (Hobby plan) con base de datos Neon Postgr
 | Análisis por mes      | 3             | Ilimitado     |
 | Comparaciones por mes | 2             | Ilimitado     |
 | Estudios guardados    | 10            | Ilimitado     |
-| Chat con IA           | Limitado      | Ilimitado     |
+| Chat con IA           | ✘             | ✔️            |
 | Exportación PDF       | ✘             | ✔️            |
 | Modelo IA             | Flash-Lite    | Flash         |
 | Perfiles familiares   | 1 perfil      | Ilimitados    |
