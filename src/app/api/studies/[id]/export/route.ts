@@ -60,7 +60,7 @@ export async function GET(
       createdAt: study.createdAt.toISOString(),
     });
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="analisis-${study.title.replace(/[^a-zA-Z0-9]/g, "-")}.pdf"`,
