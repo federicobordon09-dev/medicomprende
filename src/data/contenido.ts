@@ -98,7 +98,7 @@ export const preguntas = [
   },
   {
     pregunta: "¿Tiene algún costo?",
-    respuesta: "MediComprende tiene un plan gratuito con 3 análisis por mes. Si necesitás más, tenemos el plan Pro por $3.000 ARS/mes con análisis ilimitados, exportación PDF e historial completo. Sin permanencia, cancelás cuando quieras.",
+    respuesta: "MediComprende tiene un plan gratuito con 3 análisis por mes. Si necesitás más, tenemos el plan Pro por $100 ARS/mes con análisis ilimitados, exportación PDF e historial completo. Sin permanencia, cancelás cuando quieras.",
   },
   {
     pregunta: "¿Qué incluye el plan Pro?",

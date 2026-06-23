@@ -176,7 +176,7 @@ export default function SettingsPage() {
               disabled={upgrading}
               className="text-sm font-semibold px-4 py-2 rounded-xl bg-cta-500 hover:bg-cta-600 text-white transition-all active:scale-[0.97] disabled:opacity-50"
             >
-              {upgrading ? "Procesando…" : "Actualizar a Pro — $3.000/mes"}
+              {upgrading ? "Procesando…" : `Actualizar a Pro — $${process.env.NEXT_PUBLIC_PRO_PLAN_PRICE || "3000"}/mes`}
             </button>
           )}
         </div>
