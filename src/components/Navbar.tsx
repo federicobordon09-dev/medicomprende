@@ -10,7 +10,8 @@ import { site } from "@/data/contenido";
 export default function Navbar() {
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
-  const showMarketingNav = pathname === "/login";
+  const isLandingPage = pathname === "/";
+  const showMarketingNav = isLoginPage || isLandingPage;
   const showLoginButton = !isLoginPage && pathname !== "/register" && !pathname.startsWith("/dashboard");
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,24 +47,34 @@ export default function Navbar() {
         <div className="flex items-center gap-1 sm:gap-2">
           {showMarketingNav && (
             <>
+              {isLandingPage && (
+                <>
+                  <button
+                    onClick={() => scrollTo("como-funciona")}
+                    className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+                  >
+                    Cómo funciona
+                  </button>
+                  <button
+                    onClick={() => scrollTo("planes")}
+                    className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+                  >
+                    Planes
+                  </button>
+                  <button
+                    onClick={() => scrollTo("faq")}
+                    className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+                  >
+                    FAQ
+                  </button>
+                </>
+              )}
               <Link
                 href="/pricing"
                 className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
               >
                 Precios
               </Link>
-              <button
-                onClick={() => scrollTo("como-funciona")}
-                className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
-              >
-                Cómo funciona
-              </button>
-              <button
-                onClick={() => scrollTo("faq")}
-                className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
-              >
-                FAQ
-              </button>
             </>
           )}
 

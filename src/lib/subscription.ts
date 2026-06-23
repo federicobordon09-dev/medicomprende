@@ -3,7 +3,7 @@ import { ForbiddenError } from "./api-error";
 
 export const FREE_LIMITS = {
   MAX_ANALYSES_PER_MONTH: 3,
-  MAX_COMPARISONS_PER_MONTH: 3,
+  MAX_COMPARISONS_PER_MONTH: 2,
   MAX_STUDIES_STORED: 10,
 } as const;
 

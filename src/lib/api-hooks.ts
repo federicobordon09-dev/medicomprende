@@ -3,6 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { StudyWithAnalysis, ComparisonResult, SubscriptionData } from "@/lib/types";
 
+type RequestInit = globalThis.RequestInit;
+
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
   if (!res.ok) {

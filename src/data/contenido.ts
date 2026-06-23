@@ -127,3 +127,69 @@ export const notFound = {
   message: "Parece que te perdiste. Volvé al inicio para analizar tu informe.",
   cta: "Volver al inicio",
 };
+
+export const testimonials = [
+  {
+    text: "Por fin entendí qué decía mi resonancia. Nunca pensé que fuera tan sencillo.",
+    name: "Carolina M.",
+    role: "Paciente",
+    rating: 5,
+  },
+  {
+    text: "Lo usé con el informe de mi papá. Ahora sabemos qué preguntarle al médico.",
+    name: "Andrés F.",
+    role: "Familiar",
+    rating: 5,
+  },
+  {
+    text: "Soy médica y lo recomiendo. Ayuda muchísimo a que los pacientes lleguen a la consulta con preguntas concretas.",
+    name: "Dra. Laura G.",
+    role: "Médica clínica",
+    rating: 5,
+  },
+];
+
+export const planes = {
+  eyebrow: "Planes",
+  title: "Empezá gratis, escalá cuando quieras",
+  subtitle: "Sin compromiso, cancelás cuando quieras.",
+  planes: [
+    {
+      name: "Gratuito",
+      price: "$0",
+      period: "/mes",
+      description: "Perfecto para probar y usar ocasionalmente.",
+      features: [
+        "3 análisis por mes",
+        "2 comparaciones por mes",
+        "10 estudios guardados",
+        "Chat con IA (limitado)",
+        "Modelo Flash-Lite",
+        "1 perfil familiar",
+        "Alertas básicas",
+      ],
+      cta: "Empezar gratis",
+      href: "/register",
+      highlighted: false,
+    },
+    {
+      name: "Pro",
+      price: "$3.000",
+      period: "/mes",
+      description: "Para quienes necesitan análisis frecuentes.",
+      features: [
+        "Análisis ilimitados",
+        "Comparaciones ilimitadas",
+        "Estudios ilimitados",
+        "Exportación PDF",
+        "Modelo IA premium (Flash)",
+        "Perfiles familiares ilimitados",
+        "Alertas avanzadas",
+        "Chat con IA ilimitado",
+      ],
+      cta: "Actualizar a Pro",
+      href: "/pricing",
+      highlighted: true,
+    },
+  ],
+};

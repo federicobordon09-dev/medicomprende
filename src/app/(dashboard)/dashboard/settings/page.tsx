@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import Link from "next/link";
@@ -26,6 +26,7 @@ interface SubscriptionData {
 export default function SettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [deletingStudies, setDeletingStudies] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
@@ -37,16 +38,63 @@ export default function SettingsPage() {
   const [subData, setSubData] = useState<SubscriptionData | null>(null);
   const [loadingSub, setLoadingSub] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"success" | "failure" | "pending" | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const paymentHandledRef = useRef(false);
+
+  const paymentParam = searchParams?.get("payment");
 
   useEffect(() => {
     if (!session) return;
     setLoadingSub(true);
+
+    const payment = paymentParam;
+    if (payment === "success" && !paymentHandledRef.current) {
+      paymentHandledRef.current = true;
+      setPaymentStatus("success");
+
+      pollingRef.current = setInterval(async () => {
+        try {
+          const res = await fetch("/api/user/subscription");
+          const data = await res.json();
+          if (data.plan === "pro") {
+            setSubData(data);
+            setPaymentStatus(null);
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            queryClient.invalidateQueries({ queryKey: ["studies"] });
+            const url = new URL(window.location.href);
+            url.searchParams.delete("payment");
+            window.history.replaceState({}, "", url.toString());
+          }
+        } catch {
+          /* retry */
+        }
+      }, 2000);
+
+      setTimeout(() => {
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current);
+          setPaymentStatus(null);
+        }
+      }, 30000);
+    } else if (payment === "failure") {
+      setPaymentStatus("failure");
+      paymentHandledRef.current = true;
+    } else if (payment === "pending") {
+      setPaymentStatus("pending");
+      paymentHandledRef.current = true;
+    }
+
     fetch("/api/user/subscription")
       .then((r) => r.json())
       .then((data) => setSubData(data))
       .catch(() => {})
       .finally(() => setLoadingSub(false));
-  }, [session]);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [session, paymentParam, queryClient]);
 
   const handleUpgrade = useCallback(async () => {
     setUpgrading(true);
@@ -123,6 +171,47 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
+      {paymentStatus === "success" && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <div>
+            <p className="font-semibold text-emerald-800 text-sm">¡Pago exitoso!</p>
+            <p className="text-emerald-700 text-xs mt-0.5">Estamos activando tu plan Pro. Esto puede tomar unos segundos…</p>
+          </div>
+          <div className="flex-shrink-0 ml-auto">
+            <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
+      )}
+      {paymentStatus === "failure" && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          <div>
+            <p className="font-semibold text-red-800 text-sm">El pago no se pudo completar</p>
+            <p className="text-red-700 text-xs mt-0.5">Intentá de nuevo desde la sección de planes.</p>
+          </div>
+          <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-red-600 hover:text-red-700 underline ml-auto self-center">
+            Ver planes
+          </Link>
+        </div>
+      )}
+      {paymentStatus === "pending" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <div>
+            <p className="font-semibold text-amber-800 text-sm">Pago pendiente</p>
+            <p className="text-amber-700 text-xs mt-0.5">Estamos esperando la confirmación de Mercado Pago.</p>
+          </div>
+        </div>
+      )}
       <div>
         <h1 className="font-display font-bold text-2xl text-warm-950">Configuración</h1>
         <p className="text-warm-600 mt-1">Administrá tu cuenta y preferencias.</p>
@@ -191,7 +280,7 @@ export default function SettingsPage() {
               <p className="text-xs text-warm-500 mt-1">Análisis</p>
             </div>
             <div className="bg-azul-50 rounded-xl p-4">
-              <p className="text-2xl font-bold text-warm-950">{usage.comparisonsCount}/3</p>
+              <p className="text-2xl font-bold text-warm-950">{usage.comparisonsCount}/2</p>
               <p className="text-xs text-warm-500 mt-1">Comparaciones</p>
             </div>
             <div className="bg-azul-50 rounded-xl p-4">
@@ -199,7 +288,7 @@ export default function SettingsPage() {
               <p className="text-xs text-warm-500 mt-1">Estudios</p>
             </div>
           </div>
-          {(usage.analysesCount >= 2 || usage.comparisonsCount >= 2 || usage.studiesCount >= 8) && (
+          {(usage.analysesCount >= 2 || usage.comparisonsCount >= 1 || usage.studiesCount >= 8) && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800">
               <p className="font-medium">Estás por llegar al límite de tu plan Gratuito</p>
               <Link href="/pricing" className="text-cta-600 font-medium hover:underline mt-1 inline-block">

@@ -8,23 +8,23 @@ import { site } from "@/data/contenido";
 
 const FREE_FEATURES = [
   "3 análisis por mes",
-  "3 comparaciones por mes",
+  "2 comparaciones por mes",
   "Hasta 10 estudios guardados",
-  "Análisis con IA (Gemini)",
-  "Perfiles familiares",
-  "Alertas inteligentes",
-  "Chat contextual con IA",
+  "Chat con IA (limitado)",
+  "Modelo Flash-Lite",
+  "1 perfil familiar",
+  "Alertas básicas",
 ];
 
 const PRO_FEATURES = [
   "Análisis ilimitados",
   "Comparaciones ilimitadas",
-  "Historial completo sin límite",
+  "Estudios ilimitados",
   "Exportación de análisis en PDF",
-  "Modelo de IA premium (Gemini Flash)",
-  "Perfiles familiares",
-  "Alertas inteligentes",
-  "Chat contextual con IA",
+  "Modelo IA premium (Gemini Flash)",
+  "Perfiles familiares ilimitados",
+  "Alertas avanzadas",
+  "Chat con IA ilimitado",
   "Prioridad en procesamiento",
 ];
 
