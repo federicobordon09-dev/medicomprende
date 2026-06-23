@@ -101,6 +101,19 @@ export async function POST(request: NextRequest) {
       throw new ConflictError("Este archivo ya fue subido anteriormente.");
     }
 
+    const [analysisLimit, studyLimit] = await Promise.all([
+      canPerformAnalysis(session.user.id),
+      canStoreStudy(session.user.id),
+    ]);
+
+    if (!studyLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de ${studyLimit.remaining} estudios guardados. Actualizá a Pro para historial ilimitado.`);
+    }
+
+    if (!analysisLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de análisis gratis este mes. Actualizá a Pro para análisis ilimitados o esperá al próximo mes.`);
+    }
+
     const fileUrl = await uploadPdf(buffer, file.name, session.user.id);
 
     const study = await prisma.study.create({
@@ -118,19 +131,6 @@ export async function POST(request: NextRequest) {
         userId: session.user.id,
       },
     });
-
-    const [analysisLimit, studyLimit] = await Promise.all([
-      canPerformAnalysis(session.user.id),
-      canStoreStudy(session.user.id),
-    ]);
-
-    if (!studyLimit.allowed) {
-      throw new RateLimitError(`Alcanzaste el límite de ${studyLimit.remaining} estudios guardados. Actualizá a Pro para historial ilimitado.`);
-    }
-
-    if (!analysisLimit.allowed) {
-      throw new RateLimitError(`Alcanzaste el límite de análisis gratis este mes. Actualizá a Pro para análisis ilimitados o esperá al próximo mes.`);
-    }
 
     let analysis;
     try {
