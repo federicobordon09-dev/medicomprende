@@ -163,6 +163,9 @@ export async function POST(request: NextRequest) {
       } else if (msg.includes("quota") || msg.includes("RATE_LIMIT") || msg.includes("429")) {
         userError = "La IA alcanzó su límite diario de análisis. Esperá a mañana o upgradéá el plan de Gemini API.";
         status = 429;
+      } else if (msg.includes("503") || msg.includes("Service Unavailable") || msg.includes("high demand")) {
+        userError = "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo desde el historial.";
+        status = 503;
       } else {
         userError = "El archivo se guardó pero no pudimos analizarlo con la IA. Intentalo de nuevo desde el historial.";
         status = 500;

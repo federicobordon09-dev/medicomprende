@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { compareStudies } from "@/lib/geminiCompare";
 import { canPerformComparison, incrementComparisonCount } from "@/lib/subscription";
-import { RateLimitError } from "@/lib/api-error";
+import { RateLimitError, isAppError } from "@/lib/api-error";
 import type { Study } from "@prisma/client";
 
 const STUDY_GROUPS: Record<string, { label: string; description: string; types: string[] }> = {
@@ -162,6 +162,40 @@ Interpretación: ${a.overallInterpretation}`
     });
   } catch (error) {
     console.error("Comparison error:", error);
+    if (isAppError(error)) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+    }
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("API_KEY") || message.includes("API key")) {
+      return NextResponse.json(
+        { error: "La API key de Gemini no está configurada correctamente." },
+        { status: 500 }
+      );
+    }
+    if (message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand") || message.includes("temporary")) {
+      return NextResponse.json(
+        { error: "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo." },
+        { status: 503 }
+      );
+    }
+    if (message.includes("quota") || message.includes("RATE_LIMIT") || message.includes("429")) {
+      return NextResponse.json(
+        { error: "La IA alcanzó su límite diario de análisis gratis. Esperá a mañana o configurá un plan pago." },
+        { status: 429 }
+      );
+    }
+    if (message.includes("SAFETY") || message.includes("blocked")) {
+      return NextResponse.json(
+        { error: "La IA rechazó la comparación por políticas de seguridad. Probá con otros estudios." },
+        { status: 400 }
+      );
+    }
+    if (message.includes("fetch") || message.includes("network") || message.includes("ERR_") || message.includes("ECONN")) {
+      return NextResponse.json(
+        { error: "Error de conexión con la IA. Verificá tu internet e intentá de nuevo." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "Error al comparar los estudios. Intentalo de nuevo." },
       { status: 500 }

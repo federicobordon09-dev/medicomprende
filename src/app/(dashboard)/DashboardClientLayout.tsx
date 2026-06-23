@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
@@ -8,8 +9,10 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { OnboardingModal } from "@/components/OnboardingModal";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   return (
-    <div className="page-enter">
+    <div className={mounted ? "page-enter" : ""}>
       {children}
     </div>
   );

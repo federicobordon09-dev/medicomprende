@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canCreateProfile } from "@/lib/subscription";
 
 export async function GET() {
   const session = await auth();
@@ -14,15 +15,18 @@ export async function GET() {
     orderBy: { createdAt: "asc" },
   });
 
-  return NextResponse.json(
-    profiles.map((p: any) => ({
+  const maxProfiles = (await canCreateProfile(session.user.id)).maxProfiles;
+
+  return NextResponse.json({
+    profiles: profiles.map((p: any) => ({
       id: p.id,
       name: p.name,
       relation: p.relation,
       color: p.color,
       studyCount: p._count.studies,
-    }))
-  );
+    })),
+    maxProfiles: maxProfiles === Infinity ? 999 : maxProfiles,
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -38,9 +42,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Nombre y relación son requeridos" }, { status: 400 });
   }
 
-  const count = await prisma.familyProfile.count({ where: { userId: session.user.id } });
-  if (count >= 5) {
-    return NextResponse.json({ error: "Máximo 5 perfiles familiares" }, { status: 400 });
+  const profileLimit = await canCreateProfile(session.user.id);
+  if (!profileLimit.allowed) {
+    return NextResponse.json(
+      { error: "Alcanzaste el límite de perfiles gratuitos. Actualizá a Pro para crear más perfiles." },
+      { status: 400 }
+    );
   }
 
   const profile = await prisma.familyProfile.create({

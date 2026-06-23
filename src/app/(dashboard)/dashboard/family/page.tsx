@@ -20,6 +20,7 @@ const COLORS = ["#0D9488", "#D04C3A", "#F59E0B", "#3B82F6", "#8B5CF6"];
 export default function FamilyPage() {
   const { showToast } = useToast();
   const [profiles, setProfiles] = useState<FamilyProfileData[]>([]);
+  const [maxProfiles, setMaxProfiles] = useState(5);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -27,11 +28,27 @@ export default function FamilyPage() {
   const [color, setColor] = useState(COLORS[0]);
   const [deleteTarget, setDeleteTarget] = useState<FamilyProfileData | null>(null);
 
+  function extractProfiles(data: any): FamilyProfileData[] {
+    if (Array.isArray(data)) return data;
+    if (data?.profiles) return data.profiles;
+    return [];
+  }
+
+  function extractMaxProfiles(data: any): number {
+    if (data?.maxProfiles) return data.maxProfiles;
+    return 5;
+  }
+
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/profiles", { signal: controller.signal })
       .then((res) => res.ok ? res.json() : [])
-      .then((data) => { if (!controller.signal.aborted) setProfiles(data || []); })
+      .then((data: any) => {
+        if (!controller.signal.aborted) {
+          setProfiles(extractProfiles(data));
+          setMaxProfiles(extractMaxProfiles(data));
+        }
+      })
       .catch(() => {})
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
@@ -40,7 +57,11 @@ export default function FamilyPage() {
   const refetchProfiles = useCallback(async () => {
     try {
       const res = await fetch("/api/profiles");
-      if (res.ok) setProfiles(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        setProfiles(extractProfiles(data));
+        setMaxProfiles(extractMaxProfiles(data));
+      }
     } catch {
       // ignore
     }
@@ -102,13 +123,16 @@ export default function FamilyPage() {
           <h1 className="font-display font-bold text-2xl text-warm-950">Perfiles familiares</h1>
           <p className="text-warm-600 text-sm mt-1">Gestioná los estudios de tu familia por separado.</p>
         </div>
-        {profiles.length < 5 && (
+        {profiles.length < maxProfiles && (
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-cta-500 hover:bg-cta-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all active:scale-[0.98]"
           >
             {showForm ? "Cancelar" : "Nuevo perfil"}
           </button>
+        )}
+        {profiles.length >= maxProfiles && maxProfiles < 999 && (
+          <p className="text-xs text-warm-500">Actualizá a Pro para crear más perfiles</p>
         )}
       </div>
 

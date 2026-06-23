@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/Toast";
 import { formatFileSize } from "@/lib/utils";
 
@@ -24,39 +25,6 @@ const STEPS = [
   { label: "Generando resultados", icon: "result" },
 ];
 
-function StepIcon({ step, current }: { step: number; current: number }) {
-  const done = current > step;
-  const active = current === step;
-
-  if (done) {
-    return (
-      <div className="w-7 h-7 rounded-full bg-celeste-500 flex items-center justify-center flex-shrink-0">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-      </div>
-    );
-  }
-
-  if (active) {
-    return (
-      <div className="w-7 h-7 rounded-full bg-cta-500 flex items-center justify-center flex-shrink-0 animate-pulse">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-          <circle cx="12" cy="12" r="10" />
-        </svg>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-7 h-7 rounded-full bg-azul-200 flex items-center justify-center flex-shrink-0">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-        <circle cx="12" cy="12" r="10" />
-      </svg>
-    </div>
-  );
-}
-
 function LoadingOverlay() {
   const [step, setStep] = useState(0);
 
@@ -67,31 +35,76 @@ function LoadingOverlay() {
   }, [step]);
 
   return (
-    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center px-6 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex flex-col items-center gap-3 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-cta-100 flex items-center justify-center animate-pulse-glow">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D04C3A" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-          </svg>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center px-6"
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col items-center gap-4 mb-6"
+      >
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cta-100 to-cta-200 animate-pulse" />
+          <div className="absolute inset-0 rounded-2xl bg-cta-100/50 animate-ping" style={{ animationDuration: "2.5s" }} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D04C3A" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
         </div>
-        <p className="font-display font-semibold text-lg text-warm-950">Analizando informe</p>
-        <p className="text-sm text-warm-500 text-center max-w-xs">
-          Esto puede tomar unos segundos. No cerrés esta página.
-        </p>
-      </div>
+        <div className="text-center">
+          <p className="font-display font-semibold text-lg text-warm-950">Analizando informe</p>
+          <p className="text-sm text-warm-500 mt-0.5 max-w-xs">
+            Esto puede tomar unos segundos. No cerrés esta página.
+          </p>
+        </div>
+      </motion.div>
 
-      <div className="w-full max-w-sm space-y-2.5">
+      <div className="w-full max-w-sm space-y-2">
         {STEPS.map((s, i) => (
-          <div
+          <motion.div
             key={s.label}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-500 ${
-              i <= step ? "opacity-100" : "opacity-30"
-            }`}
+            initial={false}
+            animate={{
+              opacity: i <= step ? 1 : 0.25,
+              y: 0,
+            }}
+            transition={{ duration: 0.35 }}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg"
           >
-            <StepIcon step={i} current={step} />
+            <motion.div
+              animate={
+                i === step
+                  ? { scale: [1, 1.1, 1] }
+                  : i < step
+                    ? { scale: 1 }
+                    : { scale: 1 }
+              }
+              transition={{ duration: 1.5, repeat: i === step ? Infinity : 0, ease: "easeInOut" }}
+              className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                i < step
+                  ? "bg-celeste-500"
+                  : i === step
+                    ? "bg-cta-500 ring-2 ring-cta-400/30"
+                    : "bg-azul-200"
+              }`}
+            >
+              {i < step ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <div className="w-3 h-3 rounded-full border-[2px] border-white" />
+              )}
+            </motion.div>
             <span
-              className={`text-sm font-medium transition-colors duration-500 ${
+              className={`text-sm font-medium transition-colors duration-300 ${
                 i === step ? "text-warm-950" : i < step ? "text-warm-600" : "text-warm-400"
               }`}
             >
@@ -109,17 +122,18 @@ function LoadingOverlay() {
                 </svg>
               </span>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <div className="w-full max-w-sm mt-5 h-1.5 bg-azul-100 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-cta-500 rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+        <motion.div
+          className="h-full bg-gradient-to-r from-cta-500 to-celeste-500 rounded-full"
+          animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         />
       </div>
-    </div>
+    </motion.div>
   );
 }
 

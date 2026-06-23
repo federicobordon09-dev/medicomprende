@@ -5,6 +5,7 @@ export const FREE_LIMITS = {
   MAX_ANALYSES_PER_MONTH: 3,
   MAX_COMPARISONS_PER_MONTH: 2,
   MAX_STUDIES_STORED: 10,
+  MAX_PROFILES: 1,
 } as const;
 
 export function getCurrentMonth(): string {
@@ -36,6 +37,15 @@ export async function canPerformComparison(userId: string): Promise<{ allowed: b
   if (plan === "pro") return { allowed: true, remaining: Infinity };
 
   return checkUsageLimit(userId, "comparisonsCount", FREE_LIMITS.MAX_COMPARISONS_PER_MONTH);
+}
+
+export async function canCreateProfile(userId: string): Promise<{ allowed: boolean; remaining: number; maxProfiles: number }> {
+  const plan = await getUserPlan(userId);
+  if (plan === "pro") return { allowed: true, remaining: Infinity, maxProfiles: Infinity };
+
+  const count = await prisma.familyProfile.count({ where: { userId } });
+  const remaining = Math.max(0, FREE_LIMITS.MAX_PROFILES - count);
+  return { allowed: remaining > 0, remaining, maxProfiles: FREE_LIMITS.MAX_PROFILES };
 }
 
 export async function canStoreStudy(userId: string): Promise<{ allowed: boolean; remaining: number }> {

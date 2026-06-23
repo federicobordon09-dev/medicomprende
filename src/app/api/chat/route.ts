@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireSubscription } from "@/lib/subscription";
 import { chatWithContext } from "@/lib/geminiChat";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  try {
+    await requireSubscription(session.user.id);
+  } catch {
+    return NextResponse.json(
+      { error: "El Chat con IA es exclusivo del plan Pro. Actualizá tu plan en Configuración para usar esta función." },
+      { status: 403 }
+    );
   }
 
   try {

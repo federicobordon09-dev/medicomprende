@@ -125,6 +125,12 @@ export async function POST(
         { status: 429 }
       );
     }
+    if (message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand")) {
+      return NextResponse.json(
+        { error: "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo." },
+        { status: 503 }
+      );
+    }
     if (message.includes("SAFETY") || message.includes("blocked")) {
       return NextResponse.json(
         { error: "La IA rechazó el análisis por políticas de seguridad. Probá con otro archivo." },

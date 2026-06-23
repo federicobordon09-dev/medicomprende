@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import ChatIA from "@/components/ChatIA";
 import { formatDate } from "@/lib/utils";
 import type { OutOfRangeValue, Finding, MedicalTerm } from "@/lib/types";
 
@@ -48,6 +49,7 @@ export default function StudyDetailPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [userPlan, setUserPlan] = useState<string | null>(null);
 
   useEffect(() => {
@@ -84,7 +86,7 @@ export default function StudyDetailPage() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Error al exportar" }));
         if (res.status === 403) {
-          alert("Esta funcionalidad requiere el plan Pro. Actualizá tu plan desde Configuración.");
+          setShowUpgradePrompt(true);
           return;
         }
         throw new Error(err.error);
@@ -99,7 +101,7 @@ export default function StudyDetailPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error al descargar el PDF");
+      setAnalyzeError(e instanceof Error ? e.message : "Error al descargar el PDF");
     } finally {
       setExporting(false);
     }
@@ -199,6 +201,42 @@ export default function StudyDetailPage() {
           )}
         </div>
       </div>
+
+      {showUpgradePrompt && (
+        <div className="bg-cta-50 border border-cta-200 rounded-xl p-5 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-cta-100 flex items-center justify-center flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-cta-900 text-sm">Exportación PDF exclusiva de Pro</p>
+            <p className="text-cta-700 text-xs mt-1">Actualizá a Pro para descargar tus análisis en PDF con formato imprimible, header, footer y diseño profesional.</p>
+            <div className="flex gap-3 mt-3">
+              <a
+                href="/pricing"
+                className="text-xs font-semibold px-4 py-2 rounded-lg bg-cta-500 hover:bg-cta-600 text-white transition-all inline-flex items-center gap-1.5"
+              >
+                Ver planes
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+              <button
+                onClick={() => setShowUpgradePrompt(false)}
+                className="text-xs font-medium text-cta-600 hover:text-cta-700 px-3 py-2 rounded-lg hover:bg-cta-100/50 transition-all"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+          <button onClick={() => setShowUpgradePrompt(false)} className="flex-shrink-0 text-cta-400 hover:text-cta-600" aria-label="Cerrar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {analysis ? (
         <>
@@ -473,6 +511,10 @@ export default function StudyDetailPage() {
             <p className="text-red-600 text-sm mt-3">{analyzeError}</p>
           )}
         </div>
+      )}
+
+      {analysis && (
+        <ChatIA studyId={study.id} studyTitle={study.title} userPlan={userPlan} />
       )}
 
       <ConfirmDialog
