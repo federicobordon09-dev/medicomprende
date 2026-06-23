@@ -46,7 +46,6 @@ export async function createPreference(params: CreatePreferenceParams): Promise<
       pending: params.backUrls.pending,
     },
     notification_url: params.notificationUrl,
-    auto_return: "approved",
   };
 
   const res = await fetch(`${MP_API_BASE}/checkout/preferences`, {

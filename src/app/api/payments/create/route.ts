@@ -10,7 +10,8 @@ export async function POST(request: NextRequest) {
     const session = await requireAuth();
 
     const PRO_PRICE = parseInt(process.env.NEXT_PUBLIC_PRO_PLAN_PRICE || "3000");
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || vercelUrl || "http://localhost:3000";
 
     const existingSub = await prisma.subscription.findUnique({
       where: { userId: session.user.id },
