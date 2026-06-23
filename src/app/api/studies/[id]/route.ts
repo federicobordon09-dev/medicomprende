@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { deletePdf } from "@/lib/blob";
+import { StudyUpdateSchema, secureLog } from "@/lib/security";
 
 export async function GET(
   request: NextRequest,
@@ -85,6 +86,13 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
+  // Validate with Zod
+  const validation = StudyUpdateSchema.safeParse(body);
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]?.message || "Datos inválidos";
+    return NextResponse.json({ error: firstError }, { status: 400 });
+  }
+
   const study = await prisma.study.findFirst({
     where: { id, userId: session.user.id },
   });
@@ -93,16 +101,19 @@ export async function PATCH(
     return NextResponse.json({ error: "Estudio no encontrado" }, { status: 404 });
   }
 
+  const data = validation.data;
+
   const updated = await prisma.study.update({
     where: { id },
     data: {
-      title: body.title ?? undefined,
-      studyType: body.studyType ?? undefined,
-      studyDate: body.studyDate ? new Date(body.studyDate) : undefined,
-      notes: body.notes ?? undefined,
-      profileId: body.profileId ?? undefined,
+      title: data.title ?? undefined,
+      studyType: data.studyType ?? undefined,
+      studyDate: data.studyDate ? new Date(data.studyDate) : undefined,
+      notes: data.notes ?? undefined,
+      profileId: data.profileId ?? undefined,
     },
   });
 
+  secureLog("info", "STUDY_UPDATED", { userId: session.user.id, studyId: id });
   return NextResponse.json(updated);
 }

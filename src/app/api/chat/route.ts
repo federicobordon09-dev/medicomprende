@@ -3,12 +3,27 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireSubscription } from "@/lib/subscription";
 import { chatWithContext } from "@/lib/geminiChat";
+import {
+  ChatMessageSchema,
+  checkRateLimit,
+  rateLimitResponse,
+  secureLog,
+  RATE_LIMITS,
+} from "@/lib/security";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
+
+  // Rate limit
+  const { allowed, retryAfter } = checkRateLimit(
+    `chat:user:${session.user.id}`,
+    RATE_LIMITS.CHAT.max,
+    RATE_LIMITS.CHAT.windowMs
+  );
+  if (!allowed) return rateLimitResponse(retryAfter);
 
   try {
     await requireSubscription(session.user.id);
@@ -21,14 +36,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { message, studyIds, history } = body;
 
-    if (!message || typeof message !== "string") {
-      return NextResponse.json({ error: "Mensaje requerido" }, { status: 400 });
+    // Validate input with Zod
+    const validation = ChatMessageSchema.safeParse(body);
+    if (!validation.success) {
+      const firstError = validation.error.issues[0]?.message || "Datos inválidos";
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
+    const { message, studyIds, history } = validation.data;
+
     const whereStudies: Record<string, unknown> = { userId: session.user.id };
-    if (studyIds && Array.isArray(studyIds) && studyIds.length > 0) {
+    if (studyIds && studyIds.length > 0) {
       whereStudies.id = { in: studyIds };
     }
 
@@ -65,20 +84,26 @@ ${s.analysis ? `Resumen: ${s.analysis.summary}\nHallazgos: ${JSON.stringify(s.an
       )
       .join("\n\n");
 
-    const chatHistory = (history || []).map((h: { role: string; content: string }) => ({
+    const chatHistory = (history || []).map((h) => ({
       role: h.role as "user" | "assistant",
       content: h.content,
     }));
 
     const response = await chatWithContext(message, context, chatHistory);
 
+    secureLog("info", "CHAT_SUCCESS", { userId: session.user.id });
+
     return NextResponse.json({
       response,
       disclaimer: "Esta información es educativa y no reemplaza la consulta con un profesional de la salud.",
     });
   } catch (error) {
-    console.error("Chat error:", error);
     const message = error instanceof Error ? error.message : "";
+    secureLog("error", "CHAT_ERROR", {
+      userId: session.user.id,
+      error: message.substring(0, 200),
+    });
+
     const statusCode = typeof error === "object" && error !== null && "status" in error ? (error as any).status : null;
     if (statusCode === 503 || message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand") || message.includes("temporary")) {
       return NextResponse.json(

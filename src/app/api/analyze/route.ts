@@ -1,43 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeReport } from "@/lib/geminiClient";
+import { auth } from "@/lib/auth";
+import {
+  validatePdfUpload,
+  isValidPdfMagic,
+  sanitizePdfText,
+  checkAnalysisRateLimit,
+  secureLog,
+} from "@/lib/security";
 
-const rateLimit = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW = 60_000;
-
-function getClientIp(request: NextRequest): string {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")
-    || "unknown";
-}
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimit.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimit.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
-}
-
-const PDF_MAGIC = Buffer.from("%PDF");
-
-function isValidPdf(buffer: Buffer): boolean {
-  return buffer.slice(0, 4).equals(PDF_MAGIC);
-}
+export const maxDuration = 120;
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = getClientIp(request);
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: "Demasiadas solicitudes. Esperá un minuto antes de intentar de nuevo." },
-        { status: 429 }
-      );
-    }
+    // Check rate limit (user-based if authenticated, IP-based if anonymous)
+    const session = await auth();
+    const rateLimitResponse = await checkAnalysisRateLimit(request, session?.user?.id);
+    if (rateLimitResponse) return rateLimitResponse;
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -46,9 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No se recibió ningún archivo." }, { status: 400 });
     }
 
-    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Formato no soportado. Usá PDF o imagen." }, { status: 400 });
+    // Validate file
+    const validation = validatePdfUpload(file);
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     if (file.size > 10 * 1024 * 1024) {
@@ -58,17 +39,36 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    if (file.type === "application/pdf" && !isValidPdf(buffer)) {
+    // Magic bytes check for PDFs
+    if (file.type === "application/pdf" && !isValidPdfMagic(buffer)) {
       return NextResponse.json({ error: "El archivo no parece ser un PDF válido." }, { status: 400 });
     }
+
+    // Check for empty PDF before sending to Gemini
+    if (buffer.length < 100) {
+      return NextResponse.json(
+        { error: "El archivo está vacío o no contiene datos legibles." },
+        { status: 400 }
+      );
+    }
+
+    secureLog("info", "ANALYZE_START", {
+      userId: session?.user?.id || "anonymous",
+      fileSize: file.size,
+      fileType: file.type,
+    });
 
     // Enviamos el archivo directo a Gemini. Gemini extrae el texto y lo analiza internamente.
     let result;
     try {
-      result = await analyzeReport(buffer, file.type);
+      result = await analyzeReport(buffer, file.type, undefined, sanitizePdfText);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
-      console.error("Gemini analysis error:", message);
+      secureLog("error", "ANALYZE_GEMINI_ERROR", {
+        userId: session?.user?.id || "anonymous",
+        error: message.substring(0, 200),
+      });
+
       if (message.includes("API_KEY") || message.includes("not found") || message.includes("quota")) {
         return NextResponse.json(
           { error: "Error al procesar con la IA. Intentalo de nuevo más tarde." },
@@ -81,9 +81,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    secureLog("info", "ANALYZE_SUCCESS", {
+      userId: session?.user?.id || "anonymous",
+      fileSize: file.size,
+    });
+
     return NextResponse.json(result);
-  } catch {
-    console.error("Unexpected error in /api/analyze");
+  } catch (error) {
+    secureLog("error", "ANALYZE_UNEXPECTED", {
+      error: error instanceof Error ? error.message.substring(0, 200) : "unknown",
+    });
     return NextResponse.json(
       { error: "Ocurrió un error inesperado. Intentalo de nuevo." },
       { status: 500 }

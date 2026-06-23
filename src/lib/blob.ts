@@ -34,6 +34,19 @@ export async function uploadPdf(
   const localPath = path.join(LOCAL_DIR, blobFileName);
   await fs.mkdir(path.dirname(localPath), { recursive: true });
   await fs.writeFile(localPath, buffer);
+
+  // Clean up local file after successful write (only text analysis results persist)
+  // The raw PDF is only needed temporarily for Gemini analysis
+  try {
+    const scheduleDelete = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300_000)); // 5 min
+      await fs.unlink(localPath).catch(() => {});
+    };
+    scheduleDelete();
+  } catch {
+    // Cleanup is best-effort
+  }
+
   return `/uploads/${blobFileName}`;
 }
 

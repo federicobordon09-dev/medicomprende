@@ -6,8 +6,10 @@ import { sha256 } from "@/lib/utils";
 import { requireAuth, apiSuccess, apiError } from "@/lib/api-response";
 import { ValidationError, ConflictError, RateLimitError } from "@/lib/api-error";
 import { canPerformAnalysis, canStoreStudy, incrementAnalysisCount, getUserPlan } from "@/lib/subscription";
+import { validatePdfUpload, isValidPdfMagic, checkAnalysisRateLimit, sanitizePdfText } from "@/lib/security";
 
 export const maxDuration = 120;
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,8 +18,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get("profileId");
     const type = searchParams.get("type");
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")));
 
     const where: Record<string, unknown> = { userId: session.user.id };
     if (profileId) where.profileId = profileId;
@@ -70,6 +72,10 @@ export async function POST(request: NextRequest) {
   try {
     const session = await requireAuth();
 
+    // Rate limit
+    const rateLimitResponse = await checkAnalysisRateLimit(request, session.user.id);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const profileId = formData.get("profileId") as string | null;
@@ -82,16 +88,29 @@ export async function POST(request: NextRequest) {
       throw new ValidationError("No se recibió ningún archivo.");
     }
 
+    // Validate file
+    const validation = validatePdfUpload(file);
+    if (!validation.valid) {
+      throw new ValidationError(validation.error!);
+    }
+
     if (file.size > 15 * 1024 * 1024) {
       throw new ValidationError("El archivo es muy grande. Máximo 15MB.");
     }
 
-    if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
-      throw new ValidationError("Formato no soportado. Usá PDF o imagen.");
-    }
-
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    // Magic bytes check
+    if (file.type === "application/pdf" && !isValidPdfMagic(buffer)) {
+      throw new ValidationError("El archivo no parece ser un PDF válido.");
+    }
+
+    // Empty file check
+    if (buffer.length < 100) {
+      throw new ValidationError("El archivo está vacío o no contiene datos legibles.");
+    }
+
     const fileHash = await sha256(arrayBuffer);
 
     const existing = await prisma.study.findFirst({
@@ -135,7 +154,7 @@ export async function POST(request: NextRequest) {
     let analysis;
     try {
       const plan = await getUserPlan(session.user.id);
-      const result = await analyzeReport(buffer, file.type, plan);
+      const result = await analyzeReport(buffer, file.type, plan, sanitizePdfText);
       await incrementAnalysisCount(session.user.id);
       analysis = await prisma.analysis.create({
         data: {

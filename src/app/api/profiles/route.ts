@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canCreateProfile } from "@/lib/subscription";
+import { ProfileSchema, secureLog } from "@/lib/security";
 
 export async function GET() {
   const session = await auth();
@@ -36,11 +37,14 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, relation, color } = body;
 
-  if (!name || !relation) {
-    return NextResponse.json({ error: "Nombre y relación son requeridos" }, { status: 400 });
+  const validation = ProfileSchema.safeParse(body);
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]?.message || "Datos inválidos";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
+
+  const { name, relation, color } = validation.data;
 
   const profileLimit = await canCreateProfile(session.user.id);
   if (!profileLimit.allowed) {
@@ -53,12 +57,13 @@ export async function POST(request: NextRequest) {
   const profile = await prisma.familyProfile.create({
     data: {
       name,
-      relation,
+      relation: relation || "Familiar",
       color: color || "#0D9488",
       userId: session.user.id,
     },
   });
 
+  secureLog("info", "PROFILE_CREATED", { userId: session.user.id, profileId: profile.id });
   return NextResponse.json(profile);
 }
 
@@ -69,8 +74,14 @@ export async function PUT(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { id, name, relation, color } = body;
 
+  const validation = ProfileSchema.partial().safeParse(body);
+  if (!validation.success) {
+    const firstError = validation.error.issues[0]?.message || "Datos inválidos";
+    return NextResponse.json({ error: firstError }, { status: 400 });
+  }
+
+  const { id } = body;
   if (!id) {
     return NextResponse.json({ error: "ID requerido" }, { status: 400 });
   }
@@ -82,15 +93,17 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
   }
 
+  const data = validation.data;
   const updated = await prisma.familyProfile.update({
     where: { id },
     data: {
-      name: name ?? undefined,
-      relation: relation ?? undefined,
-      color: color ?? undefined,
+      name: data.name ?? undefined,
+      relation: data.relation ?? undefined,
+      color: data.color ?? undefined,
     },
   });
 
+  secureLog("info", "PROFILE_UPDATED", { userId: session.user.id, profileId: id });
   return NextResponse.json(updated);
 }
 
@@ -115,5 +128,6 @@ export async function DELETE(request: NextRequest) {
   }
 
   await prisma.familyProfile.delete({ where: { id } });
+  secureLog("info", "PROFILE_DELETED", { userId: session.user.id, profileId: id });
   return NextResponse.json({ success: true });
 }

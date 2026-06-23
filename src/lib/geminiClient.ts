@@ -207,7 +207,8 @@ Salida esperada:
 export async function analyzeReport(
   textOrBuffer: string | Buffer,
   mimeType?: string,
-  plan: "free" | "pro" = "free"
+  plan: "free" | "pro" = "free",
+  sanitizeFn?: (text: string) => string
 ): Promise<ReportResultV2> {
   const client = getClient();
   const modelName = plan === "pro"
@@ -252,7 +253,13 @@ export async function analyzeReport(
       console.warn("Inline file submission failed, falling back to text extraction:", inlineMsg);
       try {
         const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
-        const extractedText = await extractTextFromPdf(textOrBuffer);
+        let extractedText = await extractTextFromPdf(textOrBuffer);
+        if (sanitizeFn) {
+          extractedText = sanitizeFn(extractedText);
+        }
+        if (extractedText.trim().length < 50) {
+          throw new Error("El PDF no contiene suficiente texto legible. Asegurate de que sea un PDF digital, no escaneado.");
+        }
         const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${extractedText}`);
         rawText = result.response.text();
       } catch (textErr) {
@@ -265,7 +272,14 @@ export async function analyzeReport(
     }
   } else {
     // Modo texto: mandamos el texto extraído directamente
-    const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${textOrBuffer}`);
+    let text = textOrBuffer as string;
+    if (sanitizeFn) {
+      text = sanitizeFn(text);
+    }
+    if (text.trim().length < 50) {
+      throw new Error("El PDF no contiene suficiente texto legible. Asegurate de que sea un PDF digital, no escaneado.");
+    }
+    const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${text}`);
     rawText = result.response.text();
   }
 

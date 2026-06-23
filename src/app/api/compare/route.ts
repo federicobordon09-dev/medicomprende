@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { compareStudies } from "@/lib/geminiCompare";
 import { canPerformComparison, incrementComparisonCount } from "@/lib/subscription";
 import { RateLimitError, isAppError } from "@/lib/api-error";
+import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from "@/lib/security";
 import type { Study } from "@prisma/client";
 
 const STUDY_GROUPS: Record<string, { label: string; description: string; types: string[] }> = {
@@ -88,6 +89,14 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
+
+  // Rate limit
+  const { allowed, retryAfter } = checkRateLimit(
+    `compare:user:${session.user.id}`,
+    RATE_LIMITS.COMPARE.max,
+    RATE_LIMITS.COMPARE.windowMs
+  );
+  if (!allowed) return rateLimitResponse(retryAfter);
 
   try {
     const comparisonLimit = await canPerformComparison(session.user.id);
