@@ -166,13 +166,14 @@ Interpretación: ${a.overallInterpretation}`
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
     const message = error instanceof Error ? error.message : "";
+    const statusCode = typeof error === "object" && error !== null && "status" in error ? (error as any).status : null;
     if (message.includes("API_KEY") || message.includes("API key")) {
       return NextResponse.json(
         { error: "La API key de Gemini no está configurada correctamente." },
         { status: 500 }
       );
     }
-    if (message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand") || message.includes("temporary")) {
+    if (statusCode === 503 || message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand") || message.includes("temporary")) {
       return NextResponse.json(
         { error: "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo." },
         { status: 503 }

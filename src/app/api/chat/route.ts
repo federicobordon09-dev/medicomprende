@@ -78,6 +78,32 @@ ${s.analysis ? `Resumen: ${s.analysis.summary}\nHallazgos: ${JSON.stringify(s.an
     });
   } catch (error) {
     console.error("Chat error:", error);
+    const message = error instanceof Error ? error.message : "";
+    const statusCode = typeof error === "object" && error !== null && "status" in error ? (error as any).status : null;
+    if (statusCode === 503 || message.includes("503") || message.includes("Service Unavailable") || message.includes("high demand") || message.includes("temporary")) {
+      return NextResponse.json(
+        { error: "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo." },
+        { status: 503 }
+      );
+    }
+    if (message.includes("quota") || message.includes("RATE_LIMIT") || message.includes("429")) {
+      return NextResponse.json(
+        { error: "La IA alcanzó su límite diario. Esperá a mañana para seguir usando el chat." },
+        { status: 429 }
+      );
+    }
+    if (message.includes("SAFETY") || message.includes("blocked")) {
+      return NextResponse.json(
+        { error: "La IA rechazó la consulta por políticas de seguridad. Reformulá tu pregunta." },
+        { status: 400 }
+      );
+    }
+    if (message.includes("fetch") || message.includes("network") || message.includes("ERR_") || message.includes("ECONN")) {
+      return NextResponse.json(
+        { error: "Error de conexión con la IA. Verificá tu internet e intentá de nuevo." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "Error al procesar tu consulta. Intentalo de nuevo." },
       { status: 500 }

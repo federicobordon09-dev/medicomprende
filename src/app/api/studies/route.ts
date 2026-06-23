@@ -155,6 +155,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
+      const errStatus = typeof err === "object" && err !== null && "status" in err ? (err as any).status : null;
       let userError: string;
       let status: number;
       if (msg.includes("API_KEY") || msg.includes("API key")) {
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
       } else if (msg.includes("quota") || msg.includes("RATE_LIMIT") || msg.includes("429")) {
         userError = "La IA alcanzó su límite diario de análisis. Esperá a mañana o upgradéá el plan de Gemini API.";
         status = 429;
-      } else if (msg.includes("503") || msg.includes("Service Unavailable") || msg.includes("high demand")) {
+      } else if (errStatus === 503 || msg.includes("503") || msg.includes("Service Unavailable") || msg.includes("high demand")) {
         userError = "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo desde el historial.";
         status = 503;
       } else {
