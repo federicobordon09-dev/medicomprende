@@ -39,6 +39,12 @@ export class RateLimitError extends AppError {
   }
 }
 
+export class ForbiddenError extends AppError {
+  constructor(message = "No tenés permisos para realizar esta acción.") {
+    super(message, 403, "FORBIDDEN");
+  }
+}
+
 export function isAppError(error: unknown): error is AppError {
   return error instanceof AppError;
 }

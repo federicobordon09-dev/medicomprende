@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
@@ -51,6 +51,15 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [plan, setPlan] = useState<"free" | "pro" | null>(null);
+
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/user/subscription")
+      .then((r) => r.json())
+      .then((data) => setPlan(data.plan || "free"))
+      .catch(() => setPlan("free"));
+  }, [session]);
 
   return (
     <>
@@ -112,6 +121,15 @@ export function Sidebar() {
               <p className="text-sm font-medium truncate">{session?.user?.name || "Usuario"}</p>
               <p className="text-xs text-white/50 truncate">{session?.user?.email}</p>
             </div>
+            {plan && (
+              plan === "pro" ? (
+                <span className="text-[10px] font-bold bg-cta-500 text-white px-2 py-0.5 rounded-full">PRO</span>
+              ) : (
+                <Link href="/pricing" className="text-[10px] font-bold bg-white/10 hover:bg-white/20 text-white/80 hover:text-white px-2 py-0.5 rounded-full transition-colors">
+                  GRATIS
+                </Link>
+              )
+            )}
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}

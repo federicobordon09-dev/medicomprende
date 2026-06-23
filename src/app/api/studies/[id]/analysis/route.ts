@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { analyzeReport } from "@/lib/geminiClient";
+import { canPerformAnalysis, incrementAnalysisCount, getUserPlan } from "@/lib/subscription";
+import { RateLimitError } from "@/lib/api-error";
 import fs from "fs/promises";
 import path from "path";
 
@@ -39,6 +41,11 @@ export async function POST(
   }
 
   try {
+    const analysisLimit = await canPerformAnalysis(session.user.id);
+    if (!analysisLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de análisis gratis este mes. Actualizá a Pro para análisis ilimitados o esperá al próximo mes.`);
+    }
+
     const buffer = await readFileBuffer(study.fileUrl);
 
     if (buffer.length > MAX_ANALYSIS_BYTES) {
@@ -61,7 +68,9 @@ export async function POST(
       );
     }
 
-    const result = await analyzeReport(extractedText);
+    const plan = await getUserPlan(session.user.id);
+    const result = await analyzeReport(extractedText, undefined, plan);
+    await incrementAnalysisCount(session.user.id);
 
     if (study.analysis) {
       const updated = await prisma.analysis.update({

@@ -199,17 +199,22 @@ Salida esperada:
  *
  * @param textOrBuffer - Texto extraído del informe, o buffer con el archivo original
  * @param mimeType - Obligatorio si se pasa un buffer: MIME type del archivo (application/pdf, image/jpeg, etc.)
+ * @param plan - Plan del usuario ('free' | 'pro'), afecta el modelo usado
  *
  * Cuando se pasa un buffer, Gemini recibe el archivo directo via inlineData
  * y extrae el texto + lo analiza en un solo paso. No necesita OCR ni extracción previa.
  */
 export async function analyzeReport(
   textOrBuffer: string | Buffer,
-  mimeType?: string
+  mimeType?: string,
+  plan: "free" | "pro" = "free"
 ): Promise<ReportResultV2> {
   const client = getClient();
+  const modelName = plan === "pro"
+    ? (process.env.GEMINI_PRO_MODEL || "gemini-2.5-flash")
+    : (process.env.GEMINI_MODEL || "gemini-2.5-flash-lite");
   const model = client.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
+    model: modelName,
     generationConfig: {
       temperature: 0.15,
       topP: 0.95,

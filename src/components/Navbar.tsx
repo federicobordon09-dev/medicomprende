@@ -46,6 +46,12 @@ export default function Navbar() {
         <div className="flex items-center gap-1 sm:gap-2">
           {showMarketingNav && (
             <>
+              <Link
+                href="/pricing"
+                className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"
+              >
+                Precios
+              </Link>
               <button
                 onClick={() => scrollTo("como-funciona")}
                 className="hidden sm:inline-flex text-xs sm:text-sm font-medium px-3 py-2.5 min-h-11 items-center rounded-lg text-white/80 hover:text-white transition-colors"

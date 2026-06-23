@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { compareStudies } from "@/lib/geminiCompare";
+import { canPerformComparison, incrementComparisonCount } from "@/lib/subscription";
+import { RateLimitError } from "@/lib/api-error";
 import type { Study } from "@prisma/client";
 
 const STUDY_GROUPS: Record<string, { label: string; description: string; types: string[] }> = {
@@ -88,6 +90,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const comparisonLimit = await canPerformComparison(session.user.id);
+    if (!comparisonLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de comparaciones gratis este mes. Actualizá a Pro para comparaciones ilimitadas.`);
+    }
+
     const body = await request.json();
     const { studyIds, type = "two_way" } = body;
 
@@ -146,6 +153,8 @@ Interpretación: ${a.overallInterpretation}`
         },
       },
     });
+
+    await incrementComparisonCount(session.user.id);
 
     return NextResponse.json({
       id: comparison.id,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { StudyWithAnalysis, ComparisonResult } from "@/lib/types";
+import type { StudyWithAnalysis, ComparisonResult, SubscriptionData } from "@/lib/types";
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
@@ -67,6 +67,15 @@ export function useDeleteStudy() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studies"] });
     },
+  });
+}
+
+export function useSubscription() {
+  return useQuery({
+    queryKey: ["subscription"],
+    queryFn: () => fetchJson<SubscriptionData>("/api/user/subscription"),
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
   });
 }
 

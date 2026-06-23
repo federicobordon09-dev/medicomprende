@@ -140,3 +140,19 @@ export interface FamilyProfileData {
   color: string;
   studyCount?: number;
 }
+
+export interface SubscriptionData {
+  plan: "free" | "pro";
+  subscription: {
+    id: string;
+    status: string;
+    currentPeriodEnd: string;
+    currentPeriodStart: string;
+    cancelledAt: string | null;
+  } | null;
+  usage: {
+    analysesCount: number;
+    comparisonsCount: number;
+    studiesCount: number;
+  };
+}

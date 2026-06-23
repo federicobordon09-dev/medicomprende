@@ -4,7 +4,8 @@ import { uploadPdf } from "@/lib/blob";
 import { analyzeReport } from "@/lib/geminiClient";
 import { sha256 } from "@/lib/utils";
 import { requireAuth, apiSuccess, apiError } from "@/lib/api-response";
-import { ValidationError, ConflictError } from "@/lib/api-error";
+import { ValidationError, ConflictError, RateLimitError } from "@/lib/api-error";
+import { canPerformAnalysis, canStoreStudy, incrementAnalysisCount, getUserPlan } from "@/lib/subscription";
 
 export const maxDuration = 120;
 
@@ -118,9 +119,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const [analysisLimit, studyLimit] = await Promise.all([
+      canPerformAnalysis(session.user.id),
+      canStoreStudy(session.user.id),
+    ]);
+
+    if (!studyLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de ${studyLimit.remaining} estudios guardados. Actualizá a Pro para historial ilimitado.`);
+    }
+
+    if (!analysisLimit.allowed) {
+      throw new RateLimitError(`Alcanzaste el límite de análisis gratis este mes. Actualizá a Pro para análisis ilimitados o esperá al próximo mes.`);
+    }
+
     let analysis;
     try {
-      const result = await analyzeReport(buffer, file.type);
+      const plan = await getUserPlan(session.user.id);
+      const result = await analyzeReport(buffer, file.type, plan);
+      await incrementAnalysisCount(session.user.id);
       analysis = await prisma.analysis.create({
         data: {
           studyId: study.id,

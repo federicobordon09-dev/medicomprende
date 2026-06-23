@@ -47,6 +47,8 @@ export default function StudyDetailPage() {
   const [analyzeError, setAnalyzeError] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -62,12 +64,45 @@ export default function StudyDetailPage() {
       }
     }
     load();
+
+    fetch("/api/user/subscription")
+      .then((r) => r.json())
+      .then((data) => setUserPlan(data.plan || "free"))
+      .catch(() => setUserPlan("free"));
   }, [params.id]);
 
   const copyText = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    try {
+      const res = await fetch(`/api/studies/${study?.id}/export`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Error al exportar" }));
+        if (res.status === 403) {
+          alert("Esta funcionalidad requiere el plan Pro. Actualizá tu plan desde Configuración.");
+          return;
+        }
+        throw new Error(err.error);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `analisis-${study?.title?.replace(/[^a-zA-Z0-9]/g, "-") || "estudio"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error al descargar el PDF");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -150,6 +185,18 @@ export default function StudyDetailPage() {
           >
             ← Volver
           </button>
+          {analysis && (
+            <button
+              onClick={handleExportPdf}
+              disabled={exporting}
+              className="text-sm font-medium px-3 py-1.5 rounded-lg bg-azul-100 hover:bg-azul-200 text-azul-900 transition-all disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {exporting ? "Descargando…" : "Descargar PDF"}
+            </button>
+          )}
         </div>
       </div>
 

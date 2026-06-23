@@ -22,6 +22,8 @@ model User {
   studies        Study[]
   comparisons    Comparison[]
   alerts         Alert[]
+  subscription   Subscription?
+  usageLimits    UsageLimit[]
   resetToken     String?         @unique
   resetTokenExpiry DateTime?
   createdAt      DateTime        @default(now())
@@ -147,4 +149,30 @@ model Alert {
   dismissedAt DateTime?
   createdAt   DateTime  @default(now())
   @@index([userId, acknowledged, createdAt])
+}
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            String    @default("active")
+  mpPreferenceId    String?
+  mpSubscriptionId  String?
+  currentPeriodStart DateTime @default(now())
+  currentPeriodEnd  DateTime
+  cancelledAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model UsageLimit {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month            String
+  analysesCount    Int      @default(0)
+  comparisonsCount Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  @@unique([userId, month])
 }

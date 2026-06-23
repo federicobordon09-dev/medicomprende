@@ -98,7 +98,15 @@ export const preguntas = [
   },
   {
     pregunta: "¿Tiene algún costo?",
-    respuesta: "No, es completamente gratuito. No pedimos registro, tarjeta de crédito ni ningún dato personal. Subí, analizá, entendé.",
+    respuesta: "MediComprende tiene un plan gratuito con 3 análisis por mes. Si necesitás más, tenemos el plan Pro por $3.000 ARS/mes con análisis ilimitados, exportación PDF e historial completo. Sin permanencia, cancelás cuando quieras.",
+  },
+  {
+    pregunta: "¿Qué incluye el plan Pro?",
+    respuesta: "El plan Pro incluye análisis ilimitados, comparaciones ilimitadas, historial completo sin límite de estudios, exportación de análisis en PDF, y un modelo de IA premium para análisis más rápidos y detallados.",
+  },
+  {
+    pregunta: "¿Cómo pago el plan Pro?",
+    respuesta: "A través de Mercado Pago con tarjeta de crédito, débito o en efectivo. El pago es mensual y podés cancelar cuando quieras desde la configuración de tu cuenta.",
   },
 ];
 
