@@ -3,6 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { getPayment } from "@/lib/mercadopago";
 
 export const maxDuration = 30;
+export const runtime = "nodejs";
+
+export async function GET() {
+  return NextResponse.json({
+    status: "ok",
+    message: "Webhook endpoint activo",
+    timestamp: new Date().toISOString(),
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
