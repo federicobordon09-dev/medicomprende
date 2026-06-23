@@ -11,7 +11,7 @@ export const nav = {
 };
 
 export const hero = {
-  badge: "Sin registro • Sin costo • Confidencial",
+  badge: "Sin costo • Confidencial • IA de Google",
   title: "Subí tu informe médico y <em>enterate qué dice</em>",
   subtitle: "Dejá que la IA traduzca cada término, hallazgo y resultado a lenguaje simple. Sin vueltas, sin alarmas, sin necesidad de ser médico.",
   uploadText: "Elegí tu PDF o arrastralo acá",
@@ -42,7 +42,7 @@ export const result = {
 export const comoFunciona = {
   eyebrow: "Cómo funciona",
   title: "Tres pasos, cero complicación",
-  subtitle: "Sin registros, sin instalar nada. Solo subís, analizamos y entendés.",
+  subtitle: "Sin instalar nada. Solo subís, analizamos y entendés.",
   steps: [
     {
       number: 1,
@@ -164,7 +164,7 @@ export const planes = {
         "2 comparaciones por mes",
         "10 estudios guardados",
         "Chat con IA (limitado)",
-        "Modelo Flash-Lite",
+        "Modelo Gemini Flash-Lite",
         "1 perfil familiar",
         "Alertas básicas",
       ],
@@ -182,10 +182,11 @@ export const planes = {
         "Comparaciones ilimitadas",
         "Estudios ilimitados",
         "Exportación PDF",
-        "Modelo IA premium (Flash)",
+        "Modelo Gemini Flash",
         "Perfiles familiares ilimitados",
         "Alertas avanzadas",
         "Chat con IA ilimitado",
+        "Prioridad en procesamiento",
       ],
       cta: "Actualizar a Pro",
       href: "/pricing",

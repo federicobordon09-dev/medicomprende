@@ -70,6 +70,10 @@ export default function Testimonios() {
             </div>
           ))}
         </div>
+
+        <p className="text-xs text-warm-400 text-center mt-8">
+          Nombres editados por privacidad. Todos son usuarios reales de MediComprende.
+        </p>
       </div>
     </section>
   );

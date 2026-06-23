@@ -52,7 +52,6 @@ export const metadata: Metadata = {
     images: [`${siteUrl}/assets/images/banner_01.png`],
   },
   robots: { index: true, follow: true },
-  alternates: { canonical: siteUrl },
   other: {
     "application/ld+json": JSON.stringify({
       "@context": "https://schema.org",

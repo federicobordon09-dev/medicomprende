@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { footer } from "@/data/contenido";
 
 export default function Footer() {
@@ -24,6 +25,11 @@ export default function Footer() {
               Sin almacenamiento
             </div>
           </div>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8">
+          <Link href="/pricing" className="text-sm text-sk-400 hover:text-white transition-colors">Planes</Link>
+          <Link href="/privacidad" className="text-sm text-sk-400 hover:text-white transition-colors">Privacidad</Link>
+          <Link href="/terminos" className="text-sm text-sk-400 hover:text-white transition-colors">Términos</Link>
         </div>
         <div className="border-t border-sk-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center">
           <span className="text-sm text-sk-500">

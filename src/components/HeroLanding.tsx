@@ -18,7 +18,7 @@ export default function HeroLanding() {
       <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
         <Image
           src="/assets/images/banner_01.png"
-          alt=""
+          alt="Fondo decorativo de MediComprende"
           fill
           className="object-cover opacity-[0.04]"
           sizes="100vw"
@@ -88,15 +88,19 @@ export default function HeroLanding() {
           </Link>
         </div>
 
+        <p className="text-xs text-azul-400/60 mt-4 max-w-md transition-all duration-700 delay-350">
+          Esta es una herramienta educativa. No reemplaza la consulta con un profesional de la salud.
+        </p>
+
         <div
           className={`flex flex-wrap items-center justify-center gap-6 mt-12 transition-all duration-700 delay-500 ${
             loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
           {[
-            { value: "10K+", label: "estudios analizados" },
-            { value: "4.9", label: "valoración" },
-            { value: "0", label: "costo • sin registro" },
+                { value: "Miles de", label: "estudios analizados" },
+                { value: "4.9", label: "valoración" },
+                { value: "Plan", label: "gratuito disponible" },
           ].map((stat) => (
             <div key={stat.label} className="flex items-center gap-2">
               <span className="font-bold text-lg text-white">{stat.value}</span>
