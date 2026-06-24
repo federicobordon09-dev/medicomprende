@@ -26,8 +26,8 @@ export default function HeroLanding() {
         />
       </div>
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-[12%] left-[8%] w-64 h-64 rounded-full bg-cta-500/10 blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-[20%] right-[5%] w-80 h-80 rounded-full bg-celeste-500/8 blur-[120px] animate-float-slow" />
+        <div className="absolute top-[12%] left-[8%] w-40 sm:w-64 h-40 sm:h-64 rounded-full bg-cta-500/10 blur-[80px] sm:blur-[100px] animate-pulse-glow" />
+        <div className="absolute bottom-[20%] right-[5%] w-48 sm:w-80 h-48 sm:h-80 rounded-full bg-celeste-500/8 blur-[80px] sm:blur-[120px] animate-float-slow" />
         <div className="absolute top-[40%] right-[20%] w-2 h-2 rounded-full bg-cta-300/40 animate-float" style={{ animationDelay: "0.5s" }} />
         <div className="absolute bottom-[30%] left-[15%] w-1.5 h-1.5 rounded-full bg-celeste-300/40 animate-float-delayed" />
       </div>

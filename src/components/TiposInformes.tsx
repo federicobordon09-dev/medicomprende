@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { tiposInformes } from "@/data/contenido";
 
 const iconStyles = [
@@ -57,8 +58,27 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export default function TiposInformes() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            el.querySelectorAll(".reveal").forEach((c) => c.classList.add("visible"));
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="py-20 md:py-28 px-4 sm:px-6 bg-white relative overflow-hidden">
+    <section ref={sectionRef} className="py-20 md:py-28 px-4 sm:px-6 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-sk-50)_0%,_transparent_70%)] pointer-events-none" />
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-12 reveal">

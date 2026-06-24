@@ -143,15 +143,15 @@ function GoogleSignInCard() {
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[85vh] flex items-center py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-azul-50 via-white to-azul-50/40">
-      <DecorativeBlob className="top-20 left-10 w-[500px] h-[500px] bg-azul-200/20" />
-      <DecorativeBlob className="bottom-20 right-10 w-[400px] h-[400px] bg-cta-200/20" />
+    <section className="relative min-h-[80dvh] flex items-center py-16 sm:py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-azul-50 via-white to-azul-50/40">
+      <DecorativeBlob className="top-20 left-10 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-azul-200/20" />
+      <DecorativeBlob className="bottom-20 right-10 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-cta-200/20" />
       <DotPattern />
       <FloatingPills />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto">
-        <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
-          <div className="lg:col-span-3 space-y-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6 lg:gap-12 items-center">
+          <div className="lg:col-span-3 space-y-5 lg:space-y-6">
             <motion.div
               className="inline-flex items-center gap-2 bg-azul-100/60 backdrop-blur-sm border border-azul-200/50 rounded-full px-3.5 py-1.5"
               initial={{ opacity: 0, y: 12 }}
@@ -186,7 +186,7 @@ function HeroSection() {
             </div>
 
             <motion.div
-              className="flex flex-wrap gap-6 pt-2"
+              className="flex flex-wrap gap-4 lg:gap-6 pt-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -196,19 +196,19 @@ function HeroSection() {
                 { value: "4.9", label: "valoración" },
                 { value: "Plan", label: "gratuito disponible" },
               ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-2">
-                  <span className="font-bold text-lg text-warm-950">{stat.value}</span>
+                <div key={stat.label} className="flex items-center gap-1.5 lg:gap-2">
+                  <span className="font-bold text-base lg:text-lg text-warm-950">{stat.value}</span>
                   <span className="text-xs text-warm-500">{stat.label}</span>
                 </div>
               ))}
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2" data-aos="fade-up" data-aos-delay="300">
+            <div className="hidden sm:grid sm:grid-cols-2 gap-3 pt-2" data-aos="fade-up" data-aos-delay="300">
               <TestimonialCard {...testimonials[0]} delay={0.6} />
               <TestimonialCard {...testimonials[1]} delay={0.7} />
             </div>
 
-            <div className="flex flex-wrap items-center gap-5 pt-1">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 pt-1">
               <Link
                 href="/register"
                 className="inline-flex items-center gap-2 bg-cta-500 hover:bg-cta-600 text-white font-semibold px-6 py-3 rounded-xl transition-all active:scale-[0.97] text-[15px] shadow-[0_4px_14px_-4px_rgba(79,70,229,0.35)] hover:shadow-[0_8px_24px_-8px_rgba(79,70,229,0.45)]"
