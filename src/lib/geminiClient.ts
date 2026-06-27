@@ -248,26 +248,57 @@ export async function analyzeReport(
         throw new Error(`Gemini: ${inlineMsg}`);
       }
 
-      // Si Gemini rechazó el archivo inline (PDF no soportado), intentamos extraer texto con pdf-parse
-      // y mandar el texto (funciona para cualquier PDF con texto seleccionable).
-      console.warn("Inline file submission failed, falling back to text extraction:", inlineMsg);
-      try {
-        const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
-        let extractedText = await extractTextFromPdf(textOrBuffer);
-        if (sanitizeFn) {
-          extractedText = sanitizeFn(extractedText);
+      // Determinamos si es imagen para elegir el fallback correcto
+      const isImage = mimeType && ["image/jpeg", "image/png", "image/webp"].includes(mimeType);
+      console.warn("Inline file submission failed, falling back to", isImage ? "OCR" : "PDF extraction", ":", inlineMsg);
+
+      if (isImage) {
+        // ── Fallback para imágenes: OCR con Tesseract.js ──
+        try {
+          const { extractTextFromImage } = await import("@/lib/ocrExtractor");
+          let extractedText = await extractTextFromImage(textOrBuffer);
+          if (sanitizeFn) {
+            extractedText = sanitizeFn(extractedText);
+          }
+          if (extractedText.trim().length < 50) {
+            throw new Error("No se pudo extraer suficiente texto de la imagen.");
+          }
+          const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${extractedText}`);
+          rawText = result.response.text();
+        } catch (ocrErr) {
+          // OCR también falló — tiramos error claro específico para imágenes
+          const ocrMsg = ocrErr instanceof Error ? ocrErr.message : "";
+          if (ocrMsg.includes("OCR_TIMEOUT") || ocrMsg.includes("no está disponible")) {
+            throw new Error(
+              "El reconocimiento de texto desde imágenes no está disponible en este entorno. " +
+              "Probá subiendo el PDF digital del informe."
+            );
+          }
+          throw new Error(
+            "No pudimos analizar la foto. Asegurate de que la imagen sea clara y la letra se lea bien, " +
+            "o probá subiendo el PDF digital del informe."
+          );
         }
-        if (extractedText.trim().length < 50) {
-          throw new Error("El PDF no contiene suficiente texto legible. Asegurate de que sea un PDF digital, no escaneado.");
+      } else {
+        // ── Fallback para PDFs: extracción de texto con pdf-parse ──
+        try {
+          const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
+          let extractedText = await extractTextFromPdf(textOrBuffer);
+          if (sanitizeFn) {
+            extractedText = sanitizeFn(extractedText);
+          }
+          if (extractedText.trim().length < 50) {
+            throw new Error("El PDF no contiene suficiente texto legible. Asegurate de que sea un PDF digital, no escaneado.");
+          }
+          const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${extractedText}`);
+          rawText = result.response.text();
+        } catch (textErr) {
+          // Ambos métodos fallaron. Devolvemos el error del inline (más descriptivo)
+          if (inlineErr instanceof Error) {
+            throw new Error(`Gemini: ${inlineErr.message}`);
+          }
+          throw new Error("Error de conexión con la IA.");
         }
-        const result = await model.generateContent(`${SYSTEM_PROMPT_V2}\n\n---\n\n${extractedText}`);
-        rawText = result.response.text();
-      } catch (textErr) {
-        // Ambos métodos fallaron. Devolvemos el error del inline (más descriptivo)
-        if (inlineErr instanceof Error) {
-          throw new Error(`Gemini: ${inlineErr.message}`);
-        }
-        throw new Error("Error de conexión con la IA.");
       }
     }
   } else {

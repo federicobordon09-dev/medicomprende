@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       throw new RateLimitError(`Alcanzaste el límite de análisis gratis este mes. Actualizá a Pro para análisis ilimitados o esperá al próximo mes.`);
     }
 
-    const fileUrl = await uploadPdf(buffer, file.name, session.user.id);
+    const fileUrl = await uploadPdf(buffer, file.name, session.user.id, file.type);
 
     const study = await prisma.study.create({
       data: {
@@ -186,6 +186,10 @@ export async function POST(request: NextRequest) {
       } else if (errStatus === 503 || msg.includes("503") || msg.includes("Service Unavailable") || msg.includes("high demand")) {
         userError = "La IA de Google está temporalmente sobrecargada. Esperá unos segundos e intentá de nuevo desde el historial.";
         status = 503;
+      } else if (msg.includes("imagen") || msg.includes("foto") || msg.includes("OCR") || msg.includes("Tesseract")) {
+        // Errores específicos de imágenes — mostramos el mensaje real
+        userError = msg;
+        status = 400;
       } else {
         userError = "El archivo se guardó pero no pudimos analizarlo con la IA. Intentalo de nuevo desde el historial.";
         status = 500;

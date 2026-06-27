@@ -16,7 +16,8 @@ async function ensureLocalDir() {
 export async function uploadPdf(
   buffer: Buffer,
   fileName: string,
-  userId: string
+  userId: string,
+  mimeType?: string
 ): Promise<string> {
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const blobFileName = `${BLOB_PREFIX}/${userId}/${Date.now()}-${safeName}`;
@@ -24,7 +25,7 @@ export async function uploadPdf(
   if (hasBlobToken()) {
     const blob = await put(blobFileName, buffer, {
       access: "private",
-      contentType: "application/pdf",
+      contentType: mimeType || "application/pdf",
       addRandomSuffix: false,
     });
     return blob.url;
