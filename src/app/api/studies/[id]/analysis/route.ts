@@ -55,17 +55,33 @@ export async function POST(
       );
     }
 
-    // Extraemos el texto del PDF y lo enviamos a Gemini como texto.
-    // Esto es más confiable que mandar el PDF inline (muchos modelos no lo soportan).
-    const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
     let extractedText: string;
-    try {
-      extractedText = await extractTextFromPdf(buffer);
-    } catch {
-      return NextResponse.json(
-        { error: "No pudimos leer el texto de este archivo. Probá con un PDF que tenga texto seleccionable o volvé a subirlo." },
-        { status: 422 }
-      );
+
+    // Elegimos extractor según el tipo de archivo
+    const isImage = study.fileMimeType && ["image/jpeg", "image/png", "image/webp"].includes(study.fileMimeType);
+
+    if (isImage) {
+      // ── Re-análisis de imagen: intentamos OCR ──
+      try {
+        const { extractTextFromImage } = await import("@/lib/ocrExtractor");
+        extractedText = await extractTextFromImage(buffer);
+      } catch {
+        return NextResponse.json(
+          { error: "No pudimos leer el texto de la foto. El reconocimiento de imágenes no está disponible en este entorno. Probá subiendo el PDF digital del informe." },
+          { status: 422 }
+        );
+      }
+    } else {
+      // ── Re-análisis de PDF: extracción de texto con pdf-parse ──
+      const { extractTextFromPdf } = await import("@/lib/pdfExtractor");
+      try {
+        extractedText = await extractTextFromPdf(buffer);
+      } catch {
+        return NextResponse.json(
+          { error: "No pudimos leer el texto de este archivo. Probá con un PDF que tenga texto seleccionable o volvé a subirlo." },
+          { status: 422 }
+        );
+      }
     }
 
     const plan = await getUserPlan(session.user.id);
