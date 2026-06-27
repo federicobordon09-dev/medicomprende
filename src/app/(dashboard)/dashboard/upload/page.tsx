@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/Toast";
-import { formatFileSize } from "@/lib/utils";
+import { formatFileSize, compressImage } from "@/lib/utils";
 
 type StudyType = "resonancia" | "tomografia" | "sangre" | "electrocardiograma" | "laboratorio" | "epicrisis" | "otro";
 
@@ -191,8 +191,11 @@ export default function UploadPage() {
     setError("");
 
     try {
+      // Comprimir imágenes del celu antes de subirlas
+      const uploadFile = file.type.startsWith("image/") ? await compressImage(file) : file;
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", uploadFile);
       formData.append("studyType", studyType);
       formData.append("studyDate", studyDate);
       formData.append("title", title || file.name);
