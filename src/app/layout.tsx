@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Mono, Archivo } from "next/font/google";
 import "./globals.css";
-import "aos/dist/aos.css";
 import { SessionProvider } from "next-auth/react";
 import { QueryProvider } from "@/lib/query-provider";
 import ErrorBoundary from "@/components/ErrorBoundary";

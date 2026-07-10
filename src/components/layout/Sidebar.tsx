@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useSubscription } from "@/lib/api-hooks";
+import { useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
@@ -57,15 +58,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [plan, setPlan] = useState<"free" | "pro" | null>(null);
-
-  useEffect(() => {
-    if (!session) return;
-    fetch("/api/user/subscription")
-      .then((r) => r.json())
-      .then((data) => setPlan(data.plan || "free"))
-      .catch(() => setPlan("free"));
-  }, [session]);
+  const { data: subData } = useSubscription();
+  const plan = subData?.plan || null;
 
   return (
     <>

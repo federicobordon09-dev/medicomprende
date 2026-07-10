@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
 interface Message {
   role: "user" | "assistant";
@@ -117,15 +116,8 @@ export default function ChatIA({ studyId, studyTitle, userPlan }: ChatIAProps) {
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-6 z-40 w-[380px] max-w-[calc(100vw-2rem)] bg-white brutal-border-2 brutal-shadow flex flex-col overflow-hidden"
-          >
+      {open && (
+        <div className="fixed bottom-24 right-6 z-40 w-[380px] max-w-[calc(100vw-2rem)] bg-white brutal-border-2 brutal-shadow flex flex-col overflow-hidden animate-[chatIn_0.25s_var(--ease-out-expo)]">
             <div className="flex items-center gap-3 px-4 py-3 brutal-border-b bg-accent/10">
               <div className="w-8 h-8 bg-accent text-ink brutal-border-2 flex items-center justify-center flex-shrink-0">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -160,20 +152,18 @@ export default function ChatIA({ studyId, studyTitle, userPlan }: ChatIAProps) {
                   </div>
                   <div className="space-y-1.5">
                     {SUGGESTED_QUESTIONS.map((q, i) => (
-                      <motion.button
+                      <button
                         key={q}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.25, delay: i * 0.06 }}
                         onClick={() => handleSend(q)}
                         disabled={sending}
-                        className="w-full text-left text-xs font-mono px-3.5 py-2.5 bg-white brutal-border-2 hover:bg-accent text-ink/70 hover:text-ink transition-all active:scale-[0.98] disabled:opacity-50 flex items-center gap-2"
+                        className="w-full text-left text-xs font-mono px-3.5 py-2.5 bg-white brutal-border-2 hover:bg-accent text-ink/70 hover:text-ink transition-all active:scale-[0.98] disabled:opacity-50 flex items-center gap-2 animate-[slideUp_0.3s_var(--ease-out-expo)_both]"
+                        style={{ animationDelay: `${i * 0.06}s` }}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0">
                           <polyline points="9 18 15 12 9 6" />
                         </svg>
                         {q}
-                      </motion.button>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -200,54 +190,33 @@ export default function ChatIA({ studyId, studyTitle, userPlan }: ChatIAProps) {
                 </div>
               )}
 
-              <AnimatePresence>
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-[slideUp_0.25s_var(--ease-out-expo)_both]`}
+                >
+                  <div
+                    className={`max-w-[88%] brutal-border-2 px-3.5 py-2.5 text-sm font-mono leading-relaxed ${
+                      msg.role === "user"
+                        ? "bg-ink text-paper"
+                        : "bg-white text-ink"
+                    }`}
                   >
-                    <div
-                      className={`max-w-[88%] brutal-border-2 px-3.5 py-2.5 text-sm font-mono leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-ink text-paper"
-                          : "bg-white text-ink"
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
 
               {sending && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-start"
-                >
+                <div className="flex justify-start animate-[slideUp_0.2s_var(--ease-out-expo)]">
                   <div className="bg-white brutal-border-2 px-4 py-3">
                     <div className="flex gap-1.5 items-center h-3">
-                      <motion.span
-                        className="w-2 h-2 bg-ink"
-                        animate={{ y: [0, -7, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: 0 }}
-                      />
-                      <motion.span
-                        className="w-2 h-2 bg-ink"
-                        animate={{ y: [0, -7, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.12 }}
-                      />
-                      <motion.span
-                        className="w-2 h-2 bg-ink"
-                        animate={{ y: [0, -7, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.24 }}
-                      />
+                      <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_infinite]" />
+                      <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_0.15s_infinite]" />
+                      <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_0.3s_infinite]" />
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
 
               <div ref={messagesEndRef} />
@@ -284,9 +253,8 @@ export default function ChatIA({ studyId, studyTitle, userPlan }: ChatIAProps) {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </>
   );
 }

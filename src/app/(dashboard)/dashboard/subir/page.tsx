@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/Toast";
 import { formatFileSize, compressImage } from "@/lib/utils";
 
@@ -35,19 +34,8 @@ function LoadingOverlay() {
   }, [step]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-      className="absolute inset-0 bg-paper/95 z-10 flex flex-col items-center justify-center px-6 brutal-border-2"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col items-center gap-4 mb-6"
-      >
+    <div className="absolute inset-0 bg-paper/95 z-10 flex flex-col items-center justify-center px-6 brutal-border-2 animate-[fadeIn_0.25s_ease]">
+      <div className="flex flex-col items-center gap-4 mb-6 animate-[fadeInScale_0.35s_var(--ease-out-expo)]">
         <div className="relative w-16 h-16">
           <div className="absolute inset-0 bg-accent animate-pulse brutal-border-2" />
           <div className="absolute inset-0 bg-accent/50 animate-ping" style={{ animationDuration: "2.5s" }} />
@@ -64,32 +52,21 @@ function LoadingOverlay() {
             Esto puede tomar unos segundos. No cerrés esta página.
           </p>
         </div>
-      </motion.div>
+      </div>
 
       <div className="w-full max-w-sm space-y-2">
         {STEPS.map((s, i) => (
-          <motion.div
+          <div
             key={s.label}
-            initial={false}
-            animate={{
-              opacity: i <= step ? 1 : 0.25,
-              y: 0,
-            }}
-            transition={{ duration: 0.35 }}
-            className="flex items-center gap-3 px-3 py-2"
+            className="flex items-center gap-3 px-3 py-2 transition-opacity duration-[350ms]"
+            style={{ opacity: i <= step ? 1 : 0.25 }}
           >
-            <motion.div
-              animate={
-                i === step
-                  ? { scale: [1, 1.1, 1] }
-                  : { scale: 1 }
-              }
-              transition={{ duration: 1.5, repeat: i === step ? Infinity : 0, ease: "easeInOut" }}
-              className={`w-7 h-7 flex items-center justify-center flex-shrink-0 brutal-border-2 ${
+            <div
+              className={`w-7 h-7 flex items-center justify-center flex-shrink-0 brutal-border-2 transition-all duration-300 ${
                 i < step
                   ? "bg-ink text-paper"
                   : i === step
-                    ? "bg-accent text-ink"
+                    ? "bg-accent text-ink animate-pulse"
                     : "bg-paper-2 text-ink/40"
               }`}
             >
@@ -100,7 +77,7 @@ function LoadingOverlay() {
               ) : (
                 <div className="w-3 h-3 border-2 border-current" />
               )}
-            </motion.div>
+            </div>
             <span className={`text-sm font-mono font-bold uppercase transition-colors duration-300 ${
               i === step ? "text-ink" : i < step ? "text-ink/60" : "text-ink/30"
             }`}>
@@ -118,18 +95,17 @@ function LoadingOverlay() {
                 </svg>
               </span>
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
 
       <div className="w-full max-w-sm mt-5 h-1.5 bg-ink/10 overflow-hidden">
-        <motion.div
-          className="h-full bg-accent"
-          animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        <div
+          className="h-full bg-accent transition-all duration-[700ms] var(--ease-out-expo)"
+          style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 

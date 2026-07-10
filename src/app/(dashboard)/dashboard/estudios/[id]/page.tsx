@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import ChatIA from "@/components/ChatIA";
 import { formatDate } from "@/lib/utils";
+
+const ChatIA = lazy(() => import("@/components/ChatIA"));
 import type { OutOfRangeValue, Finding, MedicalTerm } from "@/lib/types";
 
 interface AnalysisData {
@@ -512,7 +513,9 @@ export default function StudyDetailPage() {
       )}
 
       {analysis && (
-        <ChatIA studyId={study.id} studyTitle={study.title} userPlan={userPlan} />
+        <Suspense fallback={null}>
+          <ChatIA studyId={study.id} studyTitle={study.title} userPlan={userPlan} />
+        </Suspense>
       )}
 
       <ConfirmDialog

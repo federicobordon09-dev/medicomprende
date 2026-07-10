@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ToastProvider } from "@/components/ui/Toast";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
-import OnboardingModal from "@/components/OnboardingModal";
+
+const FeedbackWidget = lazy(() => import("@/components/FeedbackWidget").then(m => ({ default: m.FeedbackWidget })));
+const OnboardingModal = lazy(() => import("@/components/OnboardingModal"));
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -26,7 +27,7 @@ export default function DashboardClientLayout({
   return (
     <AuthGuard>
       <ToastProvider>
-        <OnboardingModal />
+        <Suspense fallback={null}><OnboardingModal /></Suspense>
         <div className="h-dvh bg-paper flex overflow-hidden">
           <Sidebar />
           <div className="flex-1 flex flex-col min-w-0">
@@ -38,7 +39,7 @@ export default function DashboardClientLayout({
           </main>
         </div>
       </div>
-      <FeedbackWidget />
+      <Suspense fallback={null}><FeedbackWidget /></Suspense>
     </ToastProvider>
     </AuthGuard>
   );

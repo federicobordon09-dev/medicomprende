@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useStudies, useSubscription } from "@/lib/api-hooks";
 
 interface Study {
   id: string;
@@ -40,21 +40,18 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { data: subData } = useSubscription();
+  const { data: studiesData } = useStudies(50);
 
   useEffect(() => {
-    fetch("/api/user/subscription")
-      .then((r) => r.json())
-      .then((data) => setUserPlan(data.plan || "free"))
-      .catch(() => setUserPlan("free"));
+    if (subData?.plan) setUserPlan(subData.plan);
+  }, [subData]);
 
-    fetch("/api/studies?limit=50")
-      .then((r) => r.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : data?.studies || [];
-        setStudies(list.filter((s: Study) => s.analysis));
-      })
-      .catch(() => {});
-  }, []);
+  useEffect(() => {
+    if (studiesData?.studies) {
+      setStudies(studiesData.studies.filter((s) => s.analysis));
+    }
+  }, [studiesData]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -144,53 +141,47 @@ export default function ChatPage() {
       </div>
 
       <div className="flex-1 flex gap-4 min-h-0">
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.aside
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 280, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="flex-shrink-0 bg-white brutal-border-2 overflow-hidden lg:block hidden"
-            >
-              <div className="flex flex-col h-full">
-                <div className="px-4 py-3.5 brutal-border-b">
-                  <p className="font-mono font-bold uppercase text-sm text-ink">Tus estudios</p>
-                  <p className="text-xs font-mono text-ink/40 mt-0.5">{studies.length} con análisis</p>
-                </div>
-                <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                  {studies.length === 0 && (
-                    <p className="text-xs font-mono text-ink/40 text-center py-8">Subí un estudio para empezar</p>
-                  )}
-                  {studies.map((study) => (
-                    <button
-                      key={study.id}
-                      onClick={() => selectStudy(study)}
-                      className={`w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm transition-all brutal-border-2 ${
-                        selectedStudy?.id === study.id
-                          ? "bg-accent text-ink"
-                          : "bg-transparent text-ink/70 hover:bg-accent/30"
-                      }`}
-                    >
-                      <span className={`w-8 h-8 flex items-center justify-center flex-shrink-0 brutal-border-2 ${
-                        selectedStudy?.id === study.id ? "bg-ink text-accent" : "bg-ink/10 text-ink/60"
-                      }`}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </svg>
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-mono font-bold uppercase text-xs truncate">{study.title}</p>
-                        <p className="text-xs text-ink/40 truncate">{formatDate(study.createdAt)}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
+        <aside
+          className={`flex-shrink-0 bg-white brutal-border-2 overflow-hidden transition-all duration-200 var(--ease-out-expo) ${
+            sidebarOpen ? "w-[280px] opacity-100" : "w-0 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col h-full min-w-[280px]">
+            <div className="px-4 py-3.5 brutal-border-b">
+              <p className="font-mono font-bold uppercase text-sm text-ink">Tus estudios</p>
+              <p className="text-xs font-mono text-ink/40 mt-0.5">{studies.length} con análisis</p>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {studies.length === 0 && (
+                <p className="text-xs font-mono text-ink/40 text-center py-8">Subí un estudio para empezar</p>
+              )}
+              {studies.map((study) => (
+                <button
+                  key={study.id}
+                  onClick={() => selectStudy(study)}
+                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm transition-all brutal-border-2 ${
+                    selectedStudy?.id === study.id
+                      ? "bg-accent text-ink"
+                      : "bg-transparent text-ink/70 hover:bg-accent/30"
+                  }`}
+                >
+                  <span className={`w-8 h-8 flex items-center justify-center flex-shrink-0 brutal-border-2 ${
+                    selectedStudy?.id === study.id ? "bg-ink text-accent" : "bg-ink/10 text-ink/60"
+                  }`}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono font-bold uppercase text-xs truncate">{study.title}</p>
+                    <p className="text-xs text-ink/40 truncate">{formatDate(study.createdAt)}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
 
         <div className="flex-1 bg-white brutal-border-2 flex flex-col overflow-hidden min-w-0">
           <div className="flex items-center gap-3 px-5 py-3.5 brutal-border-b bg-accent/10">
@@ -236,14 +227,12 @@ export default function ChatPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {SUGGESTED_QUESTIONS.map((q, i) => (
-                    <motion.button
+                    <button
                       key={q}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                       onClick={() => handleSend(q)}
                       disabled={sending}
-                      className="text-left text-sm font-mono px-4 py-3 bg-white brutal-border-2 hover:bg-accent text-ink/70 hover:text-ink transition-all active:scale-[0.98] disabled:opacity-50"
+                      className="text-left text-sm font-mono px-4 py-3 bg-white brutal-border-2 hover:bg-accent text-ink/70 hover:text-ink transition-all active:scale-[0.98] disabled:opacity-50 animate-[slideUp_0.3s_var(--ease-out-expo)_both]"
+                      style={{ animationDelay: `${i * 0.08}s` }}
                     >
                       <span className="flex items-center gap-2">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0">
@@ -251,7 +240,7 @@ export default function ChatPage() {
                         </svg>
                         {q}
                       </span>
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -284,54 +273,33 @@ export default function ChatPage() {
               </div>
             )}
 
-            <AnimatePresence>
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-[slideUp_0.3s_var(--ease-out-expo)_both]`}
+              >
+                <div
+                  className={`max-w-[80%] brutal-border-2 px-4 py-3 text-sm font-mono leading-relaxed ${
+                    msg.role === "user"
+                      ? "bg-ink text-paper"
+                      : "bg-white text-ink"
+                  }`}
                 >
-                  <div
-                    className={`max-w-[80%] brutal-border-2 px-4 py-3 text-sm font-mono leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-ink text-paper"
-                        : "bg-white text-ink"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
 
             {sending && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex justify-start"
-              >
+              <div className="flex justify-start animate-[slideUp_0.2s_var(--ease-out-expo)]">
                 <div className="bg-white brutal-border-2 px-5 py-4">
                   <div className="flex gap-1.5 items-center h-4">
-                    <motion.span
-                      className="w-2 h-2 bg-ink"
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0 }}
-                    />
-                    <motion.span
-                      className="w-2 h-2 bg-ink"
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
-                    />
-                    <motion.span
-                      className="w-2 h-2 bg-ink"
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                    />
+                    <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_infinite]" />
+                    <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_0.15s_infinite]" />
+                    <span className="w-2 h-2 bg-ink animate-[dotBounce_0.6s_ease-in-out_0.3s_infinite]" />
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             <div ref={messagesEndRef} />
