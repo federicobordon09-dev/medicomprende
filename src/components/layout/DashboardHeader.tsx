@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Resumen",
-  "/dashboard/upload": "Subir estudio",
-  "/dashboard/compare": "Comparar estudios",
-  "/dashboard/alerts": "Alertas",
-  "/dashboard/family": "Perfiles familiares",
-  "/dashboard/settings": "Configuración",
+  "/dashboard/subir": "Subir estudio",
+  "/dashboard/comparar": "Comparar estudios",
+  "/dashboard/alertas": "Alertas",
+  "/dashboard/familia": "Perfiles familiares",
+  "/dashboard/configuracion": "Configuración",
 };
 
 export function DashboardHeader() {
@@ -22,7 +22,7 @@ export function DashboardHeader() {
         {title}
       </h1>
       <Link
-        href="/dashboard/upload"
+        href="/dashboard/subir"
         className="brutal-btn text-xs"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">

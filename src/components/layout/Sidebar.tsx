@@ -7,12 +7,12 @@ import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
-  { href: "/dashboard/upload", label: "Subir estudio", icon: "upload" },
-  { href: "/dashboard/compare", label: "Comparar", icon: "compare" },
-  { href: "/dashboard/alerts", label: "Alertas", icon: "bell" },
-  { href: "/dashboard/family", label: "Perfiles", icon: "users" },
-  { href: "/dashboard/chat", label: "Chat con IA", icon: "chat" },
-  { href: "/dashboard/settings", label: "Configuración", icon: "settings" },
+  { href: "/dashboard/subir", label: "Subir estudio", icon: "upload" },
+  { href: "/dashboard/comparar", label: "Comparar", icon: "compare" },
+  { href: "/dashboard/alertas", label: "Alertas", icon: "bell" },
+  { href: "/dashboard/familia", label: "Perfiles", icon: "users" },
+  { href: "/dashboard/chatear", label: "Chat con IA", icon: "chat" },
+  { href: "/dashboard/configuracion", label: "Configuración", icon: "settings" },
 ];
 
 const ICONS: Record<string, React.ReactNode> = {

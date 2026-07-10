@@ -206,7 +206,7 @@ export default function UploadPage() {
       }
 
       showToast("Estudio analizado con éxito", "success");
-      router.push(`/dashboard/studies/${data.study.id}`);
+      router.push(`/dashboard/estudios/${data.study.id}`);
     } catch {
       setError("Error de conexión. Verificá tu internet e intentá de nuevo.");
       setLoading(false);

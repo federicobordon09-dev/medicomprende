@@ -39,7 +39,7 @@ export default function ComparePage() {
         setComparing(false);
         return;
       }
-      router.push(`/dashboard/compare/${data.id}`);
+      router.push(`/dashboard/comparar/${data.id}`);
     } catch {
       setError("Error de conexión.");
       setComparing(false);
@@ -57,7 +57,7 @@ export default function ComparePage() {
         title="Se necesitan al menos 2 estudios"
         description="Subí más estudios médicos para poder compararlos."
         actionLabel="Subir estudio"
-        actionHref="/dashboard/upload"
+        actionHref="/dashboard/subir"
       />
     );
   }

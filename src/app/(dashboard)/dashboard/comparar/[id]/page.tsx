@@ -23,7 +23,7 @@ export default function CompareResultPage() {
     return (
       <div className="text-center py-16">
         <p className="text-ink/60 font-mono">{error instanceof Error ? error.message : "Comparación no encontrada."}</p>
-        <button onClick={() => router.push("/dashboard/compare")} className="brutal-btn mt-4">
+        <button onClick={() => router.push("/dashboard/comparar")} className="brutal-btn mt-4">
           Volver a comparar
         </button>
       </div>
@@ -45,7 +45,7 @@ export default function CompareResultPage() {
           <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Resultado de la comparación</h1>
           <p className="text-ink/60 text-sm font-mono mt-1">{formatDate(new Date().toISOString())}</p>
         </div>
-        <button onClick={() => router.push("/dashboard/compare")} className="text-sm font-mono font-bold uppercase text-ink/60 hover:text-ink">
+        <button onClick={() => router.push("/dashboard/comparar")} className="text-sm font-mono font-bold uppercase text-ink/60 hover:text-ink">
           ← Nueva comparación
         </button>
       </div>

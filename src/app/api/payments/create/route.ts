@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
       currencyId: "ARS",
       externalReference: session.user.id,
       backUrls: {
-        success: `${siteUrl}/dashboard/settings?payment=success`,
-        failure: `${siteUrl}/dashboard/settings?payment=failure`,
-        pending: `${siteUrl}/dashboard/settings?payment=pending`,
+        success: `${siteUrl}/dashboard/configuracion?payment=success`,
+        failure: `${siteUrl}/dashboard/configuracion?payment=failure`,
+        pending: `${siteUrl}/dashboard/configuracion?payment=pending`,
       },
       notificationUrl: `${siteUrl}/api/payments/webhook`,
     });

@@ -95,14 +95,14 @@ export default function Navbar() {
                         Dashboard
                       </Link>
                       <Link
-                        href="/dashboard/upload"
+                        href="/dashboard/subir"
                         onClick={() => setMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-mono font-bold uppercase text-ink hover:bg-accent"
                       >
                         Subir estudio
                       </Link>
                       <Link
-                        href="/dashboard/settings"
+                        href="/dashboard/configuracion"
                         onClick={() => setMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-mono font-bold uppercase text-ink hover:bg-accent"
                       >

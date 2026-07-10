@@ -97,7 +97,7 @@ const StudyListItem = memo(function StudyListItem({
 
   return (
     <Link
-      href={`/dashboard/studies/${study.id}`}
+      href={`/dashboard/estudios/${study.id}`}
       className="block brutal-card bg-white p-5"
       style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${index * 80}ms both` }}
     >
@@ -206,7 +206,7 @@ export default function DashboardPage() {
         title="Todavía no tenés ningún estudio"
         description="Subí tu primer informe médico y te lo explicamos en lenguaje claro, sin tecnicismos."
         actionLabel="Empezar ahora"
-        actionHref="/dashboard/upload"
+        actionHref="/dashboard/subir"
       />
     );
   }
@@ -242,7 +242,7 @@ export default function DashboardPage() {
             Tus últimos estudios
           </h2>
           <Link
-            href="/dashboard/upload"
+            href="/dashboard/subir"
             className="text-sm font-mono font-bold text-ink underline decoration-2 underline-offset-4 hover:bg-accent hover:no-underline px-1"
           >
             + Agregar
@@ -255,7 +255,7 @@ export default function DashboardPage() {
               <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
             </svg>
             <p className="text-sm text-ink font-mono flex-1">
-              Tenés estudios del mismo tipo. <Link href="/dashboard/compare" className="font-bold underline">Comparalos ahora</Link> para ver tu evolución.
+              Tenés estudios del mismo tipo. <Link href="/dashboard/comparar" className="font-bold underline">Comparalos ahora</Link> para ver tu evolución.
             </p>
           </div>
         )}
