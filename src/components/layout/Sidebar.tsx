@@ -84,7 +84,7 @@ export function Sidebar() {
         <div className="flex items-center justify-between p-4 border-b-[3px] border-paper/20">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="font-display font-bold text-lg uppercase tracking-tight text-paper">Medi</span>
-            <span className="font-display font-bold text-lg uppercase tracking-tight bg-accent text-ink px-1">Comp</span>
+            <span className="font-display font-bold text-lg uppercase tracking-tight bg-accent text-ink px-1">Comprende</span>
           </Link>
           <button
             onClick={() => setMobileOpen(false)}

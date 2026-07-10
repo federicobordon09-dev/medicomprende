@@ -43,9 +43,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const colors: Record<string, string> = {
-    success: "bg-mint-500 text-white",
-    error: "bg-red-500 text-white",
-    info: "bg-sk-600 text-white",
+    success: "bg-ink text-paper",
+    error: "bg-accent-2 text-white",
+    info: "bg-ink text-paper",
   };
 
   return (
@@ -55,13 +55,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`${colors[t.type]} px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 relative overflow-hidden ${exiting.has(t.id) ? "toast-exit" : ""}`}
+            className={`${colors[t.type]} brutal-border-2 px-4 py-3 flex items-center gap-3 relative overflow-hidden ${exiting.has(t.id) ? "toast-exit" : ""}`}
             style={{ animation: exiting.has(t.id) ? "none" : "toastSlideIn 0.4s var(--ease-out-expo) forwards" }}
           >
-            <span className="text-sm flex-1">{t.message}</span>
+            <span className="text-sm font-mono flex-1">{t.message}</span>
             <button
               onClick={() => removeToast(t.id)}
-              className="text-white/70 hover:text-white"
+              className="opacity-70 hover:opacity-100"
               aria-label="Cerrar"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

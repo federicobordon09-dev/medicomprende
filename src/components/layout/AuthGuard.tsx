@@ -1,36 +1,35 @@
 "use client";
 
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-
-const PUBLIC_ROUTES = ["/", "/login", "/register"];
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    if (status === "unauthenticated" && !PUBLIC_ROUTES.includes(pathname)) {
-      signIn(undefined, { callbackUrl: pathname });
+    if (status === "unauthenticated") {
+      router.replace("/login");
     }
-  }, [status, pathname, router]);
+  }, [status, router]);
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sk-50">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 rounded-full border-4 border-coral-500 border-t-transparent animate-spin mx-auto" />
-          <p className="text-warm-600">Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-paper">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-accent text-ink brutal-border-2 flex items-center justify-center mx-auto mb-4">
+            <svg className="animate-spin w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" strokeDasharray="50" strokeDashoffset="50" />
+            </svg>
+          </div>
+          <p className="text-ink/60 font-mono text-sm">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  if (status === "unauthenticated" && !PUBLIC_ROUTES.includes(pathname)) {
-    return null;
-  }
+  if (!session) return null;
 
   return <>{children}</>;
 }

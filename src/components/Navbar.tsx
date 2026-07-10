@@ -33,7 +33,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group min-h-11" aria-label="Ir al inicio">
           <span className="font-display font-bold text-lg uppercase tracking-tight text-paper">Medi</span>
-          <span className="font-display font-bold text-lg uppercase tracking-tight bg-accent text-ink px-1">Comp</span>
+          <span className="font-display font-bold text-lg uppercase tracking-tight bg-accent text-ink px-1">Comprende</span>
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">

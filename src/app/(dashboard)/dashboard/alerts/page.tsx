@@ -91,9 +91,9 @@ export default function AlertsPage() {
     <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-warm-950">Alertas</h1>
+          <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Alertas</h1>
           {!loading && (
-            <p className="text-warm-600 text-sm mt-1">
+            <p className="text-ink/60 font-mono text-sm mt-1">
               {unreadCount > 0
                 ? `Tenés ${unreadCount} alerta${unreadCount !== 1 ? "s" : ""} sin leer.`
                 : "No tenés alertas pendientes."}
@@ -103,7 +103,7 @@ export default function AlertsPage() {
         {!loading && unreadCount > 0 && (
           <button
             onClick={markAllRead}
-            className="text-sm font-medium text-cta-500 hover:text-cta-600 transition-colors"
+            className="text-sm font-mono font-bold uppercase text-accent-2 hover:underline"
           >
             Marcar todas como leídas
           </button>
@@ -115,10 +115,10 @@ export default function AlertsPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`px-4 py-2 text-sm font-mono font-bold uppercase transition-all brutal-border-2 ${
               filter === f
-                ? "bg-azul-900 text-white shadow-sm"
-                : "bg-white text-warm-600 hover:bg-azul-100 border border-warm-200"
+                ? "bg-ink text-paper"
+                : "bg-white text-ink/60 hover:bg-accent"
             }`}
           >
             {f === "unread" ? "Sin leer" : f === "all" ? "Todas" : "Leídas"}
@@ -129,9 +129,9 @@ export default function AlertsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-5 animate-pulse border border-azul-200/40">
-              <div className="h-5 w-48 bg-azul-200 rounded mb-2" />
-              <div className="h-4 w-full bg-azul-100 rounded" />
+            <div key={i} className="bg-paper-2 brutal-border-2 p-5 animate-pulse">
+              <div className="h-5 w-48 skeleton-shimmer brutal-border-2 mb-2" />
+              <div className="h-4 w-full skeleton-shimmer brutal-border-2" />
             </div>
           ))}
         </div>
@@ -140,11 +140,11 @@ export default function AlertsPage() {
           {alerts.map((alert, i) => (
             <div
               key={alert.id}
-              className={`bg-white rounded-xl p-5 border transition-all ${
+              className={`brutal-border-2 p-5 transition-all ${
                 !alert.acknowledged
-                  ? "border-cta-200 shadow-sm"
-                  : "border-azul-200/60 opacity-60"
-              } card-hover`}
+                  ? "bg-white brutal-shadow-sm"
+                  : "bg-paper-2 opacity-60"
+              }`}
               style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${i * 60}ms both` }}
             >
               <div className="flex items-start justify-between gap-4">
@@ -153,12 +153,12 @@ export default function AlertsPage() {
                     <Badge variant={severityColors[alert.severity] || "warning"}>
                       {severityLabels[alert.severity] || alert.severity}
                     </Badge>
-                    <span className="text-xs text-warm-400">{formatDate(alert.createdAt)}</span>
+                    <span className="text-xs font-mono text-ink/40">{formatDate(alert.createdAt)}</span>
                   </div>
-                  <h3 className="font-semibold text-warm-950">{alert.title}</h3>
-                  <p className="text-sm text-warm-600 mt-1">{alert.description}</p>
+                  <h3 className="font-mono font-bold uppercase text-ink">{alert.title}</h3>
+                  <p className="text-sm font-mono text-ink/60 mt-1">{alert.description}</p>
                   {alert.parameter && (
-                    <p className="text-xs text-warm-400 mt-2 font-mono">
+                    <p className="text-xs font-mono text-ink/40 mt-2">
                       Parámetro: {alert.parameter} · Tendencia: {alert.trend}
                     </p>
                   )}
@@ -166,7 +166,7 @@ export default function AlertsPage() {
                 {!alert.acknowledged && (
                   <button
                     onClick={() => markRead([alert.id])}
-                    className="flex-shrink-0 text-xs text-cta-500 hover:text-cta-600 font-medium transition-colors"
+                    className="flex-shrink-0 text-xs font-mono font-bold uppercase text-accent-2 hover:underline"
                   >
                     Leída
                   </button>

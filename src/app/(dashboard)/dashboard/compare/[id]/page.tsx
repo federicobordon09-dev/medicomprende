@@ -22,8 +22,8 @@ export default function CompareResultPage() {
   if (error || !data) {
     return (
       <div className="text-center py-16">
-        <p className="text-warm-600">{error instanceof Error ? error.message : "Comparación no encontrada."}</p>
-        <button onClick={() => router.push("/dashboard/compare")} className="text-cta-500 font-medium mt-4">
+        <p className="text-ink/60 font-mono">{error instanceof Error ? error.message : "Comparación no encontrada."}</p>
+        <button onClick={() => router.push("/dashboard/compare")} className="brutal-btn mt-4">
           Volver a comparar
         </button>
       </div>
@@ -32,9 +32,9 @@ export default function CompareResultPage() {
 
   const severityColor = (significance: string) => {
     switch (significance) {
-      case "mejora": return "text-celeste-600 bg-celeste-50";
-      case "empeoramiento": return "text-red-600 bg-red-50";
-      default: return "text-warm-600 bg-azul-50";
+      case "mejora": return "bg-accent text-ink";
+      case "empeoramiento": return "bg-accent-2 text-white";
+      default: return "bg-ink/10 text-ink";
     }
   };
 
@@ -42,49 +42,49 @@ export default function CompareResultPage() {
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-warm-950">Resultado de la comparación</h1>
-          <p className="text-warm-500 text-sm mt-1">{formatDate(new Date().toISOString())}</p>
+          <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Resultado de la comparación</h1>
+          <p className="text-ink/60 text-sm font-mono mt-1">{formatDate(new Date().toISOString())}</p>
         </div>
-        <button onClick={() => router.push("/dashboard/compare")} className="text-sm text-warm-500 hover:text-warm-700">
+        <button onClick={() => router.push("/dashboard/compare")} className="text-sm font-mono font-bold uppercase text-ink/60 hover:text-ink">
           ← Nueva comparación
         </button>
       </div>
 
-      <div className="bg-gradient-to-br from-azul-800 to-azul-950 rounded-2xl p-6 md:p-8 shadow-lg">
-        <p className="text-azul-100 leading-relaxed">{data.summary}</p>
+      <div className="bg-ink text-paper brutal-border brutal-shadow p-6 md:p-8">
+        <p className="text-paper/80 font-mono leading-relaxed">{data.summary}</p>
       </div>
 
       {data.changes && data.changes.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md">
-          <h3 className="font-display font-semibold text-lg text-warm-950 mb-4">Cambios detectados</h3>
+        <div className="bg-white brutal-border-2 p-6 md:p-8">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-4">Cambios detectados</h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm font-mono">
               <thead>
-                <tr className="border-b border-azul-100">
-                  <th className="text-left py-3 px-2 font-medium text-warm-500">Parámetro</th>
-                  <th className="text-left py-3 px-2 font-medium text-warm-500">Valor previo</th>
-                  <th className="text-left py-3 px-2 font-medium text-warm-500">Valor actual</th>
-                  <th className="text-left py-3 px-2 font-medium text-warm-500">Cambio</th>
-                  <th className="text-left py-3 px-2 font-medium text-warm-500">Significancia</th>
+                <tr className="brutal-border-b">
+                  <th className="text-left py-3 px-2 font-bold text-ink/60">Parámetro</th>
+                  <th className="text-left py-3 px-2 font-bold text-ink/60">Valor previo</th>
+                  <th className="text-left py-3 px-2 font-bold text-ink/60">Valor actual</th>
+                  <th className="text-left py-3 px-2 font-bold text-ink/60">Cambio</th>
+                  <th className="text-left py-3 px-2 font-bold text-ink/60">Significancia</th>
                 </tr>
               </thead>
               <tbody>
                 {data.changes.map((c, i) => (
-                  <tr key={i} className="border-b border-azul-50 hover:bg-azul-50/50">
-                    <td className="py-3 px-2 font-medium text-warm-900">{c.parameter}</td>
-                    <td className="py-3 px-2 text-warm-600">{c.previousValue}</td>
-                    <td className="py-3 px-2 text-warm-900 font-medium">{c.currentValue}</td>
+                  <tr key={i} className="brutal-border-b hover:bg-accent/10">
+                    <td className="py-3 px-2 font-bold text-ink">{c.parameter}</td>
+                    <td className="py-3 px-2 text-ink/60">{c.previousValue}</td>
+                    <td className="py-3 px-2 text-ink font-bold">{c.currentValue}</td>
                     <td className="py-3 px-2">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                        c.change === "aumentó" ? "bg-amber-100 text-amber-700"
-                        : c.change === "disminuyó" ? "bg-blue-100 text-blue-700"
-                        : "bg-azul-100 text-azul-600"
+                      <span className={`inline-flex px-2 py-0.5 text-xs font-mono font-bold uppercase brutal-border-2 ${
+                        c.change === "aumentó" ? "bg-accent-2 text-white"
+                        : c.change === "disminuyó" ? "bg-accent text-ink"
+                        : "bg-ink/10 text-ink"
                       }`}>
                         {c.change === "aumentó" ? "↑" : c.change === "disminuyó" ? "↓" : "→"} {c.change}
                       </span>
                     </td>
                     <td className="py-3 px-2">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${severityColor(c.significance)}`}>
+                      <span className={`inline-flex px-2 py-0.5 text-xs font-mono font-bold uppercase brutal-border-2 ${severityColor(c.significance)}`}>
                         {c.significance}
                       </span>
                     </td>
@@ -97,32 +97,32 @@ export default function CompareResultPage() {
       )}
 
       {data.trends && data.trends.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md">
-          <h3 className="font-display font-semibold text-lg text-warm-950 mb-4">Tendencias</h3>
+        <div className="bg-white brutal-border-2 p-6 md:p-8">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-4">Tendencias</h3>
           <div className="space-y-4">
             {data.trends.map((t, i) => (
-              <div key={i} className={`rounded-xl p-4 ${
-                t.trend === "empeorando" ? "bg-red-50 border border-red-200"
-                : t.trend === "mejorando" ? "bg-celeste-50 border border-celeste-200"
-                : "bg-azul-50 border border-azul-200"
+              <div key={i} className={`brutal-border-2 p-4 ${
+                t.trend === "empeorando" ? "bg-accent-2/10"
+                : t.trend === "mejorando" ? "bg-accent/10"
+                : "bg-ink/5"
               }`}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-semibold text-warm-950">{t.parameter}</h4>
-                    <p className="text-sm text-warm-500 mt-1">
+                    <h4 className="font-mono font-bold uppercase text-ink">{t.parameter}</h4>
+                    <p className="text-sm font-mono text-ink/60 mt-1">
                       Valores: {t.values.join(" → ")}
                     </p>
                   </div>
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                    t.trend === "empeorando" ? "bg-red-200 text-red-800"
-                    : t.trend === "mejorando" ? "bg-celeste-200 text-celeste-800"
-                    : "bg-azul-200 text-azul-700"
+                  <span className={`inline-flex px-2.5 py-1 text-xs font-mono font-bold uppercase brutal-border-2 ${
+                    t.trend === "empeorando" ? "bg-accent-2 text-white"
+                    : t.trend === "mejorando" ? "bg-accent text-ink"
+                    : "bg-ink/10 text-ink"
                   }`}>
-                    {t.trend === "empeorando" ? "📈 Empeorando" : t.trend === "mejorando" ? "📉 Mejorando" : "➡️ Estable"}
+                    {t.trend === "empeorando" ? "↑ Empeorando" : t.trend === "mejorando" ? "↓ Mejorando" : "→ Estable"}
                   </span>
                 </div>
                 {t.warning && (
-                  <p className="text-xs text-red-600 mt-2">⚠️ {t.warning}</p>
+                  <p className="text-xs font-mono text-accent-2 mt-2">⚠️ {t.warning}</p>
                 )}
               </div>
             ))}
@@ -131,19 +131,19 @@ export default function CompareResultPage() {
       )}
 
       {data.overallAssessment && (
-        <div className="relative bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-celeste-400">
-          <h3 className="font-display font-semibold text-lg text-warm-950 mb-3">Evaluación general</h3>
-          <p className="text-warm-700 leading-relaxed">{data.overallAssessment}</p>
+        <div className="bg-white brutal-border-2 brutal-shadow p-6 md:p-8">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-3">Evaluación general</h3>
+          <p className="text-ink/70 font-mono leading-relaxed">{data.overallAssessment}</p>
         </div>
       )}
 
       {data.recommendations && data.recommendations.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border-l-4 border-cta-400">
-          <h3 className="font-display font-semibold text-lg text-warm-950 mb-3">Recomendaciones</h3>
+        <div className="bg-accent brutal-border-2 p-6 md:p-8">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-3">Recomendaciones</h3>
           <ul className="space-y-2">
             {data.recommendations.map((r, i) => (
-              <li key={i} className="flex items-start gap-2 text-warm-700">
-                <span className="text-cta-500">💡</span>
+              <li key={i} className="flex items-start gap-2 text-ink/80 font-mono">
+                <span className="text-ink font-bold">💡</span>
                 {r}
               </li>
             ))}
@@ -151,7 +151,7 @@ export default function CompareResultPage() {
         </div>
       )}
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
+      <div className="bg-paper-2 brutal-border-2 px-4 py-3 text-xs font-mono text-ink/60">
         ⚕️ Esta comparación es educativa. Mostrásela a tu médico para una interpretación profesional.
       </div>
     </div>

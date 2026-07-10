@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <div className="font-display font-bold text-2xl uppercase tracking-tight text-paper mb-2">
               <span className="text-paper">Medi</span>
-              <span className="bg-accent text-ink px-1">Comp</span>
+              <span className="bg-accent text-ink px-1">Comprende</span>
             </div>
             <p className="text-sm text-paper/60 font-mono">{footer.tagline}</p>
           </div>

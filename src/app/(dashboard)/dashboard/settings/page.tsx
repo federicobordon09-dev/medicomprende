@@ -172,78 +172,79 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       {paymentStatus === "success" && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+        <div className="bg-accent/10 brutal-border-2 p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5 text-ink" aria-hidden="true">
             <polyline points="20 6 9 17 4 12" />
           </svg>
           <div>
-            <p className="font-semibold text-emerald-800 text-sm">¡Pago exitoso!</p>
-            <p className="text-emerald-700 text-xs mt-0.5">Estamos activando tu plan Pro. Esto puede tomar unos segundos…</p>
+            <p className="font-mono font-bold uppercase text-ink text-sm">¡Pago exitoso!</p>
+            <p className="text-ink/60 text-xs mt-0.5 font-mono">Estamos activando tu plan Pro. Esto puede tomar unos segundos…</p>
           </div>
           <div className="flex-shrink-0 ml-auto">
-            <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       )}
       {paymentStatus === "failure" && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+        <div className="bg-accent-2/10 brutal-border-2 p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5 text-accent-2" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
           <div>
-            <p className="font-semibold text-red-800 text-sm">El pago no se pudo completar</p>
-            <p className="text-red-700 text-xs mt-0.5">Intentá de nuevo desde la sección de planes.</p>
+            <p className="font-mono font-bold uppercase text-ink text-sm">El pago no se pudo completar</p>
+            <p className="text-ink/60 text-xs mt-0.5 font-mono">Intentá de nuevo desde la sección de planes.</p>
           </div>
-          <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-red-600 hover:text-red-700 underline ml-auto self-center">
+          <Link href="/pricing" className="flex-shrink-0 text-xs font-mono font-bold uppercase text-accent-2 hover:underline ml-auto self-center">
             Ver planes
           </Link>
         </div>
       )}
       {paymentStatus === "pending" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+        <div className="bg-accent/10 brutal-border-2 p-4 flex items-start gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5 text-ink" aria-hidden="true">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
           </svg>
           <div>
-            <p className="font-semibold text-amber-800 text-sm">Pago pendiente</p>
-            <p className="text-amber-700 text-xs mt-0.5">Estamos esperando la confirmación de Mercado Pago.</p>
+            <p className="font-mono font-bold uppercase text-ink text-sm">Pago pendiente</p>
+            <p className="text-ink/60 text-xs mt-0.5 font-mono">Estamos esperando la confirmación de Mercado Pago.</p>
           </div>
         </div>
       )}
+
       <div>
-        <h1 className="font-display font-bold text-2xl text-warm-950">Configuración</h1>
-        <p className="text-warm-600 mt-1">Administrá tu cuenta y preferencias.</p>
+        <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Configuración</h1>
+        <p className="text-ink/60 mt-1 font-mono">Administrá tu cuenta y preferencias.</p>
       </div>
 
-      <div className="bg-white rounded-xl p-6 border border-azul-200/60 space-y-4">
-        <h3 className="font-display font-semibold text-lg">Tu cuenta</h3>
-        <div className="flex items-center gap-4 pb-4 border-b border-azul-100">
-          <div className="w-14 h-14 rounded-full bg-cta-500 flex items-center justify-center text-white text-xl font-bold">
+      <div className="bg-white brutal-border-2 brutal-shadow p-6 space-y-4">
+        <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight">Tu cuenta</h3>
+        <div className="flex items-center gap-4 pb-4 brutal-border-b">
+          <div className="w-14 h-14 bg-accent text-ink brutal-border-2 flex items-center justify-center text-xl font-mono font-bold">
             {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
           <div>
-            <p className="font-semibold text-warm-950">{session?.user?.name || "Usuario"}</p>
-            <p className="text-sm text-warm-500">{session?.user?.email}</p>
+            <p className="font-mono font-bold uppercase text-ink">{session?.user?.name || "Usuario"}</p>
+            <p className="text-sm font-mono text-ink/60">{session?.user?.email}</p>
           </div>
         </div>
 
-        <div className="text-sm text-warm-600 space-y-2">
+        <div className="text-sm font-mono text-ink/60 space-y-2">
           <div className="flex justify-between py-2">
-            <span>Plan actual</span>
+            <span className="font-bold uppercase text-ink">Plan actual</span>
             {loadingSub ? (
-              <span className="text-xs text-warm-400">Cargando…</span>
+              <span className="text-xs text-ink/40">Cargando…</span>
             ) : isPro ? (
-              <span className="font-medium text-cta-600 bg-cta-50 px-2 py-0.5 rounded-full text-xs">Pro</span>
+              <span className="font-bold uppercase text-xs bg-accent text-ink brutal-border-2 px-2 py-0.5">Pro</span>
             ) : (
-              <span className="font-medium text-celeste-600 bg-celeste-50 px-2 py-0.5 rounded-full text-xs">Gratuito</span>
+              <span className="font-bold uppercase text-xs bg-ink/10 text-ink brutal-border-2 px-2 py-0.5">Gratuito</span>
             )}
           </div>
           {isPro && subData?.subscription?.currentPeriodEnd && (
             <div className="flex justify-between py-2">
-              <span>Próximo vencimiento</span>
-              <span className="font-medium text-warm-950">
+              <span className="font-bold uppercase text-ink">Próximo vencimiento</span>
+              <span className="font-bold text-ink">
                 {new Date(subData.subscription.currentPeriodEnd).toLocaleDateString("es-AR")}
               </span>
             </div>
@@ -255,7 +256,7 @@ export default function SettingsPage() {
             <button
               onClick={() => setConfirmCancel(true)}
               disabled={cancelling || subData?.subscription?.status === "cancelled"}
-              className="text-sm font-medium px-4 py-2 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
+              className="brutal-btn brutal-btn--red text-sm"
             >
               {subData?.subscription?.status === "cancelled" ? "Cancelación solicitada" : "Cancelar suscripción"}
             </button>
@@ -263,7 +264,7 @@ export default function SettingsPage() {
             <button
               onClick={handleUpgrade}
               disabled={upgrading}
-              className="text-sm font-semibold px-4 py-2 rounded-xl bg-cta-500 hover:bg-cta-600 text-white transition-all active:scale-[0.97] disabled:opacity-50"
+              className="brutal-btn text-sm"
             >
               {upgrading ? "Procesando…" : `Actualizar a Pro — $${process.env.NEXT_PUBLIC_PRO_PLAN_PRICE || "3000"}/mes`}
             </button>
@@ -272,26 +273,26 @@ export default function SettingsPage() {
       </div>
 
       {usage && !isPro && (
-        <div className="bg-white rounded-xl p-6 border border-azul-200/60">
-          <h3 className="font-display font-semibold text-lg mb-4">Uso del mes</h3>
+        <div className="bg-white brutal-border-2 p-6">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-4">Uso del mes</h3>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="bg-azul-50 rounded-xl p-4">
-              <p className="text-2xl font-bold text-warm-950">{usage.analysesCount}/3</p>
-              <p className="text-xs text-warm-500 mt-1">Análisis</p>
+            <div className="bg-paper-2 brutal-border-2 p-4">
+              <p className="text-2xl font-display font-bold text-ink">{usage.analysesCount}/3</p>
+              <p className="text-xs font-mono text-ink/60 mt-1 uppercase">Análisis</p>
             </div>
-            <div className="bg-azul-50 rounded-xl p-4">
-              <p className="text-2xl font-bold text-warm-950">{usage.comparisonsCount}/2</p>
-              <p className="text-xs text-warm-500 mt-1">Comparaciones</p>
+            <div className="bg-paper-2 brutal-border-2 p-4">
+              <p className="text-2xl font-display font-bold text-ink">{usage.comparisonsCount}/2</p>
+              <p className="text-xs font-mono text-ink/60 mt-1 uppercase">Comparaciones</p>
             </div>
-            <div className="bg-azul-50 rounded-xl p-4">
-              <p className="text-2xl font-bold text-warm-950">{usage.studiesCount}/10</p>
-              <p className="text-xs text-warm-500 mt-1">Estudios</p>
+            <div className="bg-paper-2 brutal-border-2 p-4">
+              <p className="text-2xl font-display font-bold text-ink">{usage.studiesCount}/10</p>
+              <p className="text-xs font-mono text-ink/60 mt-1 uppercase">Estudios</p>
             </div>
           </div>
           {(usage.analysesCount >= 2 || usage.comparisonsCount >= 1 || usage.studiesCount >= 8) && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-800">
-              <p className="font-medium">Estás por llegar al límite de tu plan Gratuito</p>
-              <Link href="/pricing" className="text-cta-600 font-medium hover:underline mt-1 inline-block">
+            <div className="mt-4 bg-accent/10 brutal-border-2 p-3 text-sm font-mono text-ink">
+              <p className="font-bold uppercase">Estás por llegar al límite de tu plan Gratuito</p>
+              <Link href="/pricing" className="text-accent-2 font-bold uppercase hover:underline mt-1 inline-block">
                 Actualizá a Pro para análisis ilimitados →
               </Link>
             </div>
@@ -299,9 +300,9 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl p-6 border border-azul-200/60">
-        <h3 className="font-display font-semibold text-lg mb-4">Información legal</h3>
-        <div className="space-y-3 text-sm text-warm-600">
+      <div className="bg-white brutal-border-2 p-6">
+        <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight mb-4">Información legal</h3>
+        <div className="space-y-3 text-sm font-mono text-ink/70">
           <p>
             MediComprende es una herramienta educativa que utiliza inteligencia artificial
             para ayudar a los pacientes a comprender mejor sus estudios médicos.
@@ -317,26 +318,26 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-6 border border-red-200">
-        <h3 className="font-display font-semibold text-lg text-red-600 mb-2">Zona de peligro</h3>
-        <p className="text-sm text-warm-600 mb-4">
+      <div className="bg-white brutal-border-2 border-accent-2 p-6">
+        <h3 className="font-display font-bold text-lg text-accent-2 uppercase tracking-tight mb-2">Zona de peligro</h3>
+        <p className="text-sm font-mono text-ink/60 mb-4">
           Estas acciones son irreversibles. Eliminar tu cuenta borrará todos tus estudios, análisis y datos.
         </p>
         {error && (
-          <p className="text-red-600 text-sm mb-3">{error}</p>
+          <p className="text-accent-2 text-sm font-mono mb-3">{error}</p>
         )}
         <div className="flex gap-3">
           <button
             onClick={() => setConfirmStudies(true)}
             disabled={deletingStudies}
-            className="bg-white border-2 border-red-300 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 rounded-xl text-sm transition-all disabled:opacity-50"
+            className="bg-white border-2 border-accent-2 text-accent-2 hover:bg-accent-2 hover:text-white font-mono font-bold uppercase px-4 py-2 text-sm transition-all disabled:opacity-50"
           >
             {deletingStudies ? "Eliminando…" : "Eliminar todos los estudios"}
           </button>
           <button
             onClick={() => setConfirmAccount(true)}
             disabled={deletingAccount}
-            className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-all"
+            className="bg-accent-2 hover:bg-accent-2/80 disabled:opacity-50 text-white font-mono font-bold uppercase px-4 py-2 text-sm transition-all"
           >
             {deletingAccount ? "Eliminando…" : "Eliminar cuenta"}
           </button>

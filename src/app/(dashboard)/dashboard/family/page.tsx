@@ -120,33 +120,33 @@ export default function FamilyPage() {
     <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl text-warm-950">Perfiles familiares</h1>
-          <p className="text-warm-600 text-sm mt-1">Gestioná los estudios de tu familia por separado.</p>
+          <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Perfiles familiares</h1>
+          <p className="text-ink/60 text-sm font-mono mt-1">Gestioná los estudios de tu familia por separado.</p>
         </div>
         {profiles.length < maxProfiles && (
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-cta-500 hover:bg-cta-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all active:scale-[0.98]"
+            className="brutal-btn text-sm"
           >
             {showForm ? "Cancelar" : "Nuevo perfil"}
           </button>
         )}
         {profiles.length >= maxProfiles && maxProfiles < 999 && (
-          <p className="text-xs text-warm-500">Actualizá a Pro para crear más perfiles</p>
+          <p className="text-xs font-mono text-ink/60">Actualizá a Pro para crear más perfiles</p>
         )}
       </div>
 
       {loading && (
         <div className="space-y-4">
-          <div className="h-8 w-64 bg-azul-200 rounded-lg skeleton-shimmer" />
+          <div className="h-8 w-64 skeleton-shimmer brutal-border-2" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-xl p-5 border border-azul-200/40 animate-pulse">
+              <div key={i} className="bg-paper-2 brutal-border-2 p-5 animate-pulse">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-azul-200" />
+                  <div className="w-10 h-10 bg-ink/20 brutal-border-2" />
                   <div className="flex-1">
-                    <div className="h-4 w-24 bg-azul-200 rounded mb-2" />
-                    <div className="h-3 w-32 bg-azul-100 rounded" />
+                    <div className="h-4 w-24 bg-ink/20 brutal-border-2 mb-2" />
+                    <div className="h-3 w-32 bg-ink/10 brutal-border-2" />
                   </div>
                 </div>
               </div>
@@ -156,25 +156,25 @@ export default function FamilyPage() {
       )}
 
       {!loading && showForm && (
-        <form onSubmit={createProfile} className="bg-white rounded-xl p-6 border border-azul-200/60 space-y-4">
-          <h3 className="font-display font-semibold text-lg text-warm-950">Nuevo perfil</h3>
+        <form onSubmit={createProfile} className="bg-white brutal-border-2 brutal-shadow p-6 space-y-5">
+          <h3 className="font-display font-bold text-lg text-ink uppercase tracking-tight">Nuevo perfil</h3>
           <div>
-            <label className="block text-sm font-medium text-warm-700 mb-1">Nombre</label>
+            <label className="block text-sm font-mono font-bold uppercase text-ink mb-1">Nombre</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Papá, Hijo, Abuela..."
-              className="w-full px-4 py-2.5 border border-azul-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500 transition-all text-sm"
+              className="brutal-input"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-warm-700 mb-1">Relación</label>
+            <label className="block text-sm font-mono font-bold uppercase text-ink mb-1">Relación</label>
             <select
               value={relation}
               onChange={(e) => setRelation(e.target.value)}
-              className="w-full px-4 py-2.5 border border-azul-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500 transition-all text-sm"
+              className="brutal-input"
             >
               {RELATIONS.map((r) => (
                 <option key={r.value} value={r.value}>{r.label}</option>
@@ -182,14 +182,14 @@ export default function FamilyPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-warm-700 mb-2">Color</label>
+            <label className="block text-sm font-mono font-bold uppercase text-ink mb-2">Color</label>
             <div className="flex gap-2">
               {COLORS.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className={`w-8 h-8 rounded-full transition-all ${color === c ? "ring-2 ring-offset-2 ring-cta-500 scale-110" : "ring-1 ring-azul-200"}`}
+                  className={`w-8 h-8 brutal-border-2 transition-all ${color === c ? "ring-2 ring-offset-2 ring-ink scale-110" : ""}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -197,7 +197,7 @@ export default function FamilyPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-cta-500 hover:bg-cta-600 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-[0.98]"
+            className="w-full brutal-btn"
           >
             Crear perfil
           </button>
@@ -207,16 +207,16 @@ export default function FamilyPage() {
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {profiles.map((p, i) => (
-            <div key={p.id} className="bg-white rounded-xl p-5 border border-azul-200/60 card-hover"
+            <div key={p.id} className="bg-white brutal-card p-5"
               style={{ animation: `slideUp 0.4s var(--ease-out-expo) ${i * 60}ms both` }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: p.color }}>
+                  <div className="w-10 h-10 flex items-center justify-center text-white font-mono font-bold text-sm brutal-border-2" style={{ backgroundColor: p.color }}>
                     {p.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-warm-950">{p.name}</h3>
-                    <p className="text-xs text-warm-500">
+                    <h3 className="font-mono font-bold uppercase text-ink">{p.name}</h3>
+                    <p className="text-xs font-mono text-ink/60">
                       {RELATIONS.find((r) => r.value === p.relation)?.label || p.relation}
                       {p.studyCount !== undefined && ` · ${p.studyCount} estudio${p.studyCount !== 1 ? "s" : ""}`}
                     </p>
@@ -224,7 +224,7 @@ export default function FamilyPage() {
                 </div>
                 <button
                   onClick={() => setDeleteTarget(p)}
-                  className="text-warm-400 hover:text-red-500 transition-colors"
+                  className="text-ink/40 hover:text-accent-2 transition-colors"
                   title="Eliminar perfil"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

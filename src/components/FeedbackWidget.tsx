@@ -78,34 +78,34 @@ export function FeedbackWidget() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-30 w-14 h-14 rounded-full bg-cta-500 hover:bg-cta-600 text-white shadow-xl hover:shadow-cta-500/25 flex items-center justify-center transition-all active:scale-90"
+        className="fixed bottom-6 right-6 z-30 w-14 h-14 bg-accent text-ink brutal-border-2 brutal-shadow-sm flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
         aria-label="Enviar feedback"
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       </button>
 
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-2xl border-l border-azul-200 flex flex-col transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 right-0 z-50 h-full w-full max-w-md bg-paper brutal-border-l flex flex-col transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {enviado ? (
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="text-center max-w-sm">
-              <div className="w-16 h-16 rounded-full bg-celeste-100 flex items-center justify-center mx-auto mb-5">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-celeste-600">
+              <div className="w-16 h-16 bg-accent text-ink brutal-border-2 flex items-center justify-center mx-auto mb-5">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <h2 className="font-display font-bold text-xl text-warm-950 mb-2">¡Gracias por tu mensaje!</h2>
-              <p className="text-warm-600 text-sm leading-relaxed">
+              <h2 className="font-display font-bold text-xl text-ink uppercase tracking-tight mb-2">¡Gracias por tu mensaje!</h2>
+              <p className="text-ink/60 text-sm font-mono leading-relaxed">
                 Tu {tipo === "sugerencia" ? "sugerencia" : "reporte"} nos ayuda a mejorar.
                 Lo revisamos y te respondemos si es necesario.
               </p>
               <button
                 onClick={resetForm}
-                className="mt-6 text-sm font-medium text-cta-600 hover:text-cta-500 transition-colors"
+                className="mt-6 text-sm font-mono font-bold uppercase text-accent-2 hover:underline"
               >
                 Cerrar
               </button>
@@ -113,45 +113,43 @@ export function FeedbackWidget() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between px-6 py-5 border-b border-azul-100">
+            <div className="flex items-center justify-between px-6 py-5 brutal-border-b">
               <div>
-                <h2 className="font-display font-semibold text-xl text-warm-950">Ideas y comentarios</h2>
-                <p className="text-sm text-warm-600 mt-0.5">
+                <h2 className="font-display font-bold text-xl text-ink uppercase tracking-tight">Ideas y comentarios</h2>
+                <p className="text-sm font-mono text-ink/60 mt-0.5">
                   Ayudanos a mejorar MediComprende con tus sugerencias o reportando errores.
                 </p>
               </div>
-              <button onClick={() => setOpen(false)} className="w-9 h-9 rounded-xl bg-azul-50 hover:bg-azul-100 flex items-center justify-center text-warm-500 transition-colors flex-shrink-0">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              <button onClick={() => setOpen(false)} className="w-9 h-9 bg-ink/10 hover:bg-ink/20 brutal-border-2 flex items-center justify-center text-ink transition-colors flex-shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </button>
             </div>
 
             <div className="flex-1 overflow-auto p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-warm-700 mb-3">¿Qué tipo de mensaje es?</label>
+                <label className="block text-sm font-mono font-bold uppercase text-ink mb-3">¿Qué tipo de mensaje es?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {TIPOS.map((t) => (
                     <button
                       key={t.value}
                       type="button"
                       onClick={() => setTipo(t.value)}
-                      className={`relative text-left p-4 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                      className={`relative text-left p-4 brutal-border-2 transition-all active:scale-[0.98] ${
                         tipo === t.value
-                          ? "border-cta-500 bg-cta-50/50 shadow-sm"
-                          : "border-azul-200/60 bg-white hover:border-azul-300 hover:bg-azul-50/30"
+                          ? "bg-accent text-ink"
+                          : "bg-white text-ink hover:bg-accent/50"
                       }`}
                     >
                       <span className="text-xl block mb-1.5">{t.icon}</span>
-                      <span className={`text-sm font-semibold block ${tipo === t.value ? "text-cta-700" : "text-warm-900"}`}>
-                        {t.label}
-                      </span>
-                      <span className="text-xs text-warm-500 mt-0.5 block leading-snug">{t.desc}</span>
+                      <span className="text-sm font-bold font-mono block">{t.label}</span>
+                      <span className="text-xs text-ink/60 mt-0.5 block leading-snug font-mono">{t.desc}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label htmlFor="fw-mensaje" className="block text-sm font-medium text-warm-700 mb-1.5">
+                <label htmlFor="fw-mensaje" className="block text-sm font-mono font-bold uppercase text-ink mb-1.5">
                   Contanos más
                 </label>
                 <textarea
@@ -166,23 +164,23 @@ export function FeedbackWidget() {
                       ? "Describí el error que encontraste..."
                       : "Seleccioná un tipo de mensaje..."
                   }
-                  className="w-full px-3.5 py-2.5 bg-white border border-azul-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500 transition-all text-sm resize-none"
+                  className="brutal-input resize-none"
                 />
-                <p className="text-xs text-warm-400 mt-1.5 text-right">
+                <p className="text-xs text-ink/40 mt-1.5 text-right font-mono">
                   {mensaje.length} caracteres{mensaje.length > 0 && mensaje.length < 10 ? " (mínimo 10)" : ""}
                 </p>
               </div>
 
               <div>
-                <label htmlFor="fw-email" className="block text-sm font-medium text-warm-700 mb-1.5">
+                <label htmlFor="fw-email" className="block text-sm font-mono font-bold uppercase text-ink mb-1.5">
                   ¿Cómo te contactamos?
                 </label>
-                <div className="flex items-center gap-2 bg-azul-50/50 rounded-xl px-3.5 py-1.5 border border-azul-200/60 mb-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-azul-500 flex-shrink-0">
+                <div className="flex items-center gap-2 bg-ink/5 brutal-border-2 px-3.5 py-1.5 mb-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-ink/60 flex-shrink-0">
                     <rect x="2" y="4" width="20" height="16" rx="2" />
                     <path d="M22 4l-10 8L2 4" />
                   </svg>
-                  <span className="text-xs text-warm-500">Solo necesitamos tu email para responderte</span>
+                  <span className="text-xs font-mono text-ink/60">Solo necesitamos tu email para responderte</span>
                 </div>
                 <input
                   id="fw-email"
@@ -190,21 +188,21 @@ export function FeedbackWidget() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
-                  className="w-full px-3.5 py-2.5 bg-white border border-azul-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-cta-500/30 focus:border-cta-500 transition-all text-sm"
+                  className="brutal-input"
                 />
-                <p className="text-xs text-warm-400 mt-1.5">Opcional — si querés que te respondamos</p>
+                <p className="text-xs text-ink/40 mt-1.5 font-mono">Opcional — si querés que te respondamos</p>
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 border border-red-200">{error}</p>
+                <p className="text-sm font-mono text-white bg-accent-2 brutal-border-2 px-3 py-2">{error}</p>
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-azul-100">
+            <div className="px-6 py-4 brutal-border-t">
               <button
                 onClick={handleSubmit}
                 disabled={!tipo || mensaje.trim().length < 10 || enviando}
-                className="w-full bg-cta-500 hover:bg-cta-600 disabled:bg-azul-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all active:scale-[0.97] flex items-center justify-center gap-2 text-sm"
+                className="w-full brutal-btn"
               >
                 {enviando ? (
                   <span className="flex items-center justify-center gap-2">
@@ -223,7 +221,7 @@ export function FeedbackWidget() {
       </div>
 
       {open && (
-        <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 bg-ink/30 z-40 lg:hidden" onClick={() => setOpen(false)} />
       )}
     </>
   );

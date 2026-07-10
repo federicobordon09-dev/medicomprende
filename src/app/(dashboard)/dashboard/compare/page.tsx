@@ -65,12 +65,12 @@ export default function ComparePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display font-bold text-2xl text-warm-950">Comparar estudios</h1>
-        <p className="text-warm-600 mt-1">Seleccioná 2 o más estudios para ver los cambios en tus resultados.</p>
+        <h1 className="font-display font-bold text-2xl text-ink uppercase tracking-tight">Comparar estudios</h1>
+        <p className="text-ink/60 font-mono mt-1">Seleccioná 2 o más estudios para ver los cambios en tus resultados.</p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>
+        <div className="bg-accent-2 text-white px-4 py-3 text-sm font-mono font-bold uppercase brutal-border-2">{error}</div>
       )}
 
       <div className="space-y-2">
@@ -80,24 +80,24 @@ export default function ComparePage() {
             <button
               key={study.id}
               onClick={() => toggleStudy(study.id)}
-              className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
+              className={`w-full flex items-center gap-4 p-4 brutal-border-2 text-left transition-all ${
                 isSelected
-                  ? "border-cta-500 bg-cta-50"
-                  : "border-azul-200 bg-white hover:border-azul-300"
+                  ? "bg-accent text-ink"
+                  : "bg-white text-ink/70 hover:bg-accent/30"
               }`}
             >
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                isSelected ? "border-cta-500 bg-cta-500" : "border-azul-300"
+              <div className={`w-5 h-5 flex items-center justify-center flex-shrink-0 brutal-border-2 ${
+                isSelected ? "bg-ink border-ink" : "border-ink/30"
               }`}>
                 {isSelected && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-warm-950">{study.title}</p>
-                <p className="text-sm text-warm-500">{study.studyType || "Estudio"} · {formatDate(study.createdAt)}</p>
+                <p className="font-mono font-bold uppercase text-sm">{study.title}</p>
+                <p className="text-xs font-mono text-ink/60">{study.studyType || "Estudio"} · {formatDate(study.createdAt)}</p>
               </div>
             </button>
           );
@@ -105,11 +105,11 @@ export default function ComparePage() {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-warm-500">{selectedIds.length} estudio{selectedIds.length !== 1 ? "s" : ""} seleccionado{selectedIds.length !== 1 ? "s" : ""}</p>
+        <p className="text-sm font-mono text-ink/60">{selectedIds.length} estudio{selectedIds.length !== 1 ? "s" : ""} seleccionado{selectedIds.length !== 1 ? "s" : ""}</p>
         <button
           onClick={handleCompare}
           disabled={selectedIds.length < 2 || comparing}
-          className="bg-cta-500 hover:bg-cta-600 disabled:bg-azul-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all active:scale-[0.97]"
+          className="brutal-btn"
         >
           {comparing ? "Comparando..." : "Comparar"}
         </button>

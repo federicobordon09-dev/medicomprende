@@ -11,7 +11,6 @@ const FREE_FEATURES = [
   "2 comparaciones por mes",
   "Hasta 10 estudios guardados",
   "Chat con IA (limitado)",
-  "Modelo Gemini Flash-Lite",
   "1 perfil familiar",
   "Alertas básicas",
 ];
@@ -21,7 +20,7 @@ const PRO_FEATURES = [
   "Comparaciones ilimitadas",
   "Estudios ilimitados",
   "Exportación de análisis en PDF",
-  "Modelo Gemini Flash",
+  "Modelo IA premium",
   "Perfiles familiares ilimitados",
   "Alertas avanzadas",
   "Chat con IA ilimitado",
@@ -85,21 +84,21 @@ export default function PricingClient() {
   const isAlreadyPro = userPlan === "pro";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-azul-50 to-white pt-24 pb-16">
+    <div className="min-h-screen bg-paper pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-cta-600 uppercase tracking-wider mb-2">
+          <p className="text-sm font-mono font-bold text-accent-2 uppercase tracking-wider mb-2">
             Planes
           </p>
-          <h1 className="font-display font-bold text-3xl sm:text-4xl text-warm-950 mb-3">
+          <h1 className="font-display font-bold text-3xl sm:text-4xl text-ink uppercase tracking-tight mb-3">
             Empezá gratis, upgradeá cuando quieras
           </h1>
-          <p className="text-warm-600 max-w-xl mx-auto">
-            {site.name} es gratis para empezar. Cuando necesites más, elegí el plan Pro por un precio accesible.
+          <p className="text-ink/60 font-mono max-w-xl mx-auto text-sm">
+            {site.name} es gratis para empezar. Cuando necesites más, elegí el plan Pro.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto items-start">
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto items-start">
           <PricingCard
             name="Gratuito"
             price="$0"
@@ -125,10 +124,10 @@ export default function PricingClient() {
         </div>
 
         <div className="mt-16 text-center">
-          <p className="text-sm text-warm-500">
-            Pagás una vez al mes. Podés cancelar cuando quieras. {/* TODO: MP recurrencia */}
+          <p className="text-sm font-mono text-ink/60">
+            Pagás una vez al mes. Podés cancelar cuando quieras.
           </p>
-          <p className="text-xs text-warm-400 mt-2">
+          <p className="text-xs font-mono text-ink/40 mt-2">
             El pago se procesa a través de Mercado Pago. No almacenamos datos de tu tarjeta.
           </p>
         </div>

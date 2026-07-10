@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ToastProvider } from "@/components/ui/Toast";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
-import { OnboardingModal } from "@/components/OnboardingModal";
+import OnboardingModal from "@/components/OnboardingModal";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
