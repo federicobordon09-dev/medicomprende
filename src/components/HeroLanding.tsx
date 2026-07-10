@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { hero } from "@/data/contenido";
 
 export default function HeroLanding() {
@@ -14,62 +13,38 @@ export default function HeroLanding() {
   }, []);
 
   return (
-    <section className="relative min-h-dvh flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-b from-azul-950 via-azul-900 to-azul-950">
-      <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <Image
-          src="/assets/images/banner_01.png"
-          alt="Fondo decorativo de MediComprende"
-          fill
-          className="object-cover opacity-[0.04]"
-          sizes="100vw"
-          priority
-        />
-      </div>
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-[12%] left-[8%] w-40 sm:w-64 h-40 sm:h-64 rounded-full bg-cta-500/10 blur-[80px] sm:blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-[20%] right-[5%] w-48 sm:w-80 h-48 sm:h-80 rounded-full bg-celeste-500/8 blur-[80px] sm:blur-[120px] animate-float-slow" />
-        <div className="absolute top-[40%] right-[20%] w-2 h-2 rounded-full bg-cta-300/40 animate-float" style={{ animationDelay: "0.5s" }} />
-        <div className="absolute bottom-[30%] left-[15%] w-1.5 h-1.5 rounded-full bg-celeste-300/40 animate-float-delayed" />
-      </div>
+    <section className="relative min-h-dvh flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-16 sm:pb-20 overflow-hidden bg-ink">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--color-paper) 1px, transparent 1px), linear-gradient(90deg, var(--color-paper) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-ink via-transparent to-transparent" aria-hidden="true" />
 
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center">
-        <div
-          className={`inline-flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/15 rounded-full px-3.5 py-1.5 mb-6 transition-all duration-700 ${
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-celeste-400" />
-          <span className="text-xs font-medium text-azul-200 tracking-wide">{hero.badge}</span>
-        </div>
+      <div
+        className={`relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center transition-all duration-700 ${
+          loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        }`}
+      >
+        <span className="brutal-tag mb-6">{hero.badge}</span>
 
-        <h1
-          className={`font-display font-extrabold text-[clamp(2rem,5vw,3.8rem)] leading-[1.08] text-white mb-4 max-w-3xl transition-all duration-700 delay-100 ${
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <h1 className="font-display font-bold text-[clamp(2.4rem,6vw,4.6rem)] leading-[1.02] text-paper uppercase tracking-tight mb-5 max-w-4xl">
           Subí tu informe médico y{" "}
-          <span className="relative inline-block">
-            <span className="text-cta-400 relative z-10">enterate qué dice</span>
-            <span className="absolute bottom-1 left-0 right-0 h-3 bg-cta-500/20 rounded-full blur-sm -z-0" />
-          </span>
+          <span className="bg-accent text-ink px-2 inline-block mt-1">enterate qué dice</span>
         </h1>
 
-        <p
-          className={`text-base sm:text-lg text-azul-200/80 leading-relaxed mb-8 max-w-xl transition-all duration-700 delay-200 ${
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <p className="text-base sm:text-xl text-paper/70 leading-relaxed mb-8 max-w-xl font-mono">
           {hero.subtitle}
         </p>
 
-        <div
-          className={`flex flex-col sm:flex-row items-center gap-4 transition-all duration-700 delay-300 ${
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-cta-500 hover:bg-cta-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl text-base active:scale-[0.97] transition-all duration-150"
+            className="brutal-btn text-base px-8 py-4"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polyline points="20 6 9 17 4 12" />
@@ -78,33 +53,29 @@ export default function HeroLanding() {
           </Link>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-azul-300 hover:text-white font-medium px-6 py-4 rounded-xl transition-colors"
+            className="brutal-btn brutal-btn--white text-base px-6 py-4"
           >
             Iniciar sesión
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <line x1="12" y1="5" x2="12" y2="19" />
               <polyline points="19 12 12 19 5 12" />
             </svg>
           </Link>
         </div>
 
-        <p className="text-xs text-azul-400/60 mt-4 max-w-md transition-all duration-700 delay-350">
-          Esta es una herramienta educativa. No reemplaza la consulta con un profesional de la salud.
+        <p className="text-xs text-paper/50 mt-5 max-w-md font-mono uppercase">
+          Herramienta educativa. No reemplaza la consulta con un profesional.
         </p>
 
-        <div
-          className={`flex flex-wrap items-center justify-center gap-6 mt-12 transition-all duration-700 delay-500 ${
-            loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
-        >
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-12">
           {[
-                { value: "Miles de", label: "estudios analizados" },
-                { value: "4.9", label: "valoración" },
-                { value: "Plan", label: "gratuito disponible" },
+            { value: "Miles de", label: "estudios analizados" },
+            { value: "4.9", label: "valoración" },
+            { value: "Gratis", label: "plan disponible" },
           ].map((stat) => (
-            <div key={stat.label} className="flex items-center gap-2">
-              <span className="font-bold text-lg text-white">{stat.value}</span>
-              <span className="text-xs text-azul-300">{stat.label}</span>
+            <div key={stat.label} className="flex items-center gap-2 bg-paper brutal-border-2 px-4 py-2">
+              <span className="font-display font-bold text-lg text-ink">{stat.value}</span>
+              <span className="text-xs text-ink/60 font-mono uppercase">{stat.label}</span>
             </div>
           ))}
         </div>

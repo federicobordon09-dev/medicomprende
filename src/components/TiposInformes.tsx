@@ -4,12 +4,12 @@ import { useEffect, useRef } from "react";
 import { tiposInformes } from "@/data/contenido";
 
 const iconStyles = [
-  { bg: "bg-coral-100 text-coral-600", card: "bg-coral-50/40 border-coral-200 hover:border-coral-300" },
-  { bg: "bg-sk-100 text-sk-600", card: "bg-sk-50/40 border-sk-200 hover:border-sk-300" },
-  { bg: "bg-mint-100 text-mint-600", card: "bg-mint-50/40 border-mint-200 hover:border-mint-300" },
-  { bg: "bg-amber-100 text-amber-500", card: "bg-amber-50/40 border-amber-200 hover:border-amber-300" },
-  { bg: "bg-coral-100 text-coral-600", card: "bg-coral-50/40 border-coral-200 hover:border-coral-300" },
-  { bg: "bg-sk-100 text-sk-600", card: "bg-sk-50/40 border-sk-200 hover:border-sk-300" },
+  { bg: "bg-ink text-accent" },
+  { bg: "bg-accent text-ink" },
+  { bg: "bg-accent-2 text-white" },
+  { bg: "bg-ink text-accent" },
+  { bg: "bg-accent text-ink" },
+  { bg: "bg-ink text-accent" },
 ];
 
 const icons: Record<string, React.ReactNode> = {
@@ -78,26 +78,25 @@ export default function TiposInformes() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 px-4 sm:px-6 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-sk-50)_0%,_transparent_70%)] pointer-events-none" />
+    <section ref={sectionRef} className="py-20 md:py-28 px-4 sm:px-6 bg-white border-t-[3px] border-ink relative overflow-hidden">
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-12 reveal">
-          <h2 className="font-display font-extrabold text-[clamp(1.8rem,4vw,3rem)] text-warm-950 mb-3">
+          <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] text-ink uppercase mb-3">
             {tiposInformes.title}
           </h2>
-          <p className="text-base md:text-lg text-warm-500 max-w-xl mx-auto px-2">{tiposInformes.subtitle}</p>
+          <p className="text-base md:text-lg text-ink/60 max-w-xl mx-auto px-2 font-mono">{tiposInformes.subtitle}</p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {tiposInformes.tipos.map((tipo, i) => (
             <div
               key={i}
-              className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl border-2 ${iconStyles[i].card} transition-all duration-300 group reveal`}
+              className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-5 brutal-card bg-white group reveal`}
               style={{ transitionDelay: `${i * 70}ms` }}
             >
-              <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${iconStyles[i].bg} group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 brutal-border-2 ${iconStyles[i].bg}`}>
                 {icons[tipo.icon] || icons.file}
               </div>
-              <span className="font-semibold text-sm sm:text-base text-warm-900 leading-tight">{tipo.name}</span>
+              <span className="font-bold text-sm sm:text-base text-ink uppercase leading-tight">{tipo.name}</span>
             </div>
           ))}
         </div>

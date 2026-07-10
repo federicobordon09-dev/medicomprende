@@ -89,8 +89,17 @@
   --color-warm-900: #4A443E;
   --color-warm-950: #2C2824;
 
-  --font-display: 'Figtree', sans-serif;
-  --font-body: 'Noto Sans', sans-serif;
+  /* Brutalism palette */
+  --color-ink: #0F0F0F;
+  --color-ink-soft: #2B2B2B;
+  --color-paper: #F4EFE6;
+  --color-paper-2: #EDE6D8;
+  --color-accent: #FFE600;
+  --color-accent-2: #FF4D2E;
+  --color-line: #0F0F0F;
+
+  --font-display: 'Space_Mono', monospace;
+  --font-body: 'Archivo', sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.23, 1, 0.32, 1);
@@ -293,6 +302,114 @@
 
 .toast-exit {
   animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+/* ============================================================
+   BRUTALISM DESIGN SYSTEM
+   Raw, high-contrast, hard borders, offset shadows, mono type.
+   ============================================================ */
+
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  .brutal-border { border: 3px solid var(--color-ink); }
+  .brutal-border-2 { border: 2px solid var(--color-ink); }
+  .brutal-border-b { border-bottom: 3px solid var(--color-ink); }
+
+  .brutal-shadow { box-shadow: 6px 6px 0 0 var(--color-ink); }
+  .brutal-shadow-sm { box-shadow: 4px 4px 0 0 var(--color-ink); }
+  .brutal-shadow-accent { box-shadow: 6px 6px 0 0 var(--color-accent); }
+  .brutal-shadow-2 { box-shadow: 6px 6px 0 0 var(--color-accent-2); }
+
+  /* Hard shadow that lifts on hover */
+  .brutal-card {
+    background: #fff;
+    border: 3px solid var(--color-ink);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+    transition: transform 0.15s var(--ease-out-expo), box-shadow 0.15s var(--ease-out-expo);
+  }
+  .brutal-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 0 var(--color-ink);
+  }
+
+  .brutal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: 3px solid var(--color-ink);
+    background: var(--color-accent);
+    color: var(--color-ink);
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+    transition: transform 0.12s var(--ease-out-expo), box-shadow 0.12s var(--ease-out-expo), background 0.12s;
+  }
+  .brutal-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+  .brutal-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0 0 var(--color-ink);
+  }
+  .brutal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+  }
+
+  .brutal-btn--ink { background: var(--color-ink); color: #fff; }
+  .brutal-btn--ink:hover { background: var(--color-ink-soft); }
+  .brutal-btn--white { background: #fff; color: var(--color-ink); }
+  .brutal-btn--red { background: var(--color-accent-2); color: #fff; }
+
+  /* Mono uppercase label/tag */
+  .brutal-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    border: 2px solid var(--color-ink);
+    background: var(--color-accent);
+    color: var(--color-ink);
+    padding: 0.25rem 0.7rem;
+  }
+  .brutal-tag--white { background: #fff; }
+  .brutal-tag--ink { background: var(--color-ink); color: #fff; }
+  .brutal-tag--red { background: var(--color-accent-2); color: #fff; }
+
+  .brutal-input {
+    width: 100%;
+    background: #fff;
+    border: 3px solid var(--color-ink);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    padding: 0.75rem 1rem;
+    transition: box-shadow 0.12s var(--ease-out-expo);
+  }
+  .brutal-input::placeholder { color: #8a8478; }
+  .brutal-input:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 0 var(--color-accent);
+  }
+
+  .brutal-divider { border-top: 3px solid var(--color-ink); }
+
+  .brutal-mono { font-family: var(--font-display); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,9 +3,9 @@
 import { comoFunciona } from "@/data/contenido";
 
 const stepBgColors = [
-  "from-cta-500 to-cta-600",
-  "from-azul-500 to-azul-600",
-  "from-celeste-500 to-celeste-600",
+  "bg-ink text-accent",
+  "bg-accent text-ink",
+  "bg-ink text-accent-2",
 ];
 
 function StepIcon({ icon }: { icon: string }) {
@@ -35,31 +35,31 @@ function StepIcon({ icon }: { icon: string }) {
 
 export default function ComoFunciona() {
   return (
-    <section id="como-funciona" className="py-20 md:py-32 px-4 sm:px-6 bg-gradient-to-b from-azul-50 to-white relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-azul-200/30 rounded-full blur-3xl pointer-events-none" />
+    <section id="como-funciona" className="py-20 md:py-32 px-4 sm:px-6 bg-paper border-t-[3px] border-ink relative overflow-hidden">
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-14">
-          <h2 className="font-display font-extrabold text-[clamp(1.8rem,4vw,3rem)] text-azul-950 mb-3">
+          <span className="brutal-tag mb-4">{comoFunciona.eyebrow || "Cómo funciona"}</span>
+          <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] text-ink uppercase mt-4 mb-3">
             {comoFunciona.title}
           </h2>
-          <p className="text-base md:text-lg text-warm-500 max-w-xl mx-auto px-2">{comoFunciona.subtitle}</p>
+          <p className="text-base md:text-lg text-ink/60 max-w-xl mx-auto px-2 font-mono">{comoFunciona.subtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {comoFunciona.steps.map((step, i) => (
             <div
               key={i}
-              className="group relative bg-white rounded-xl p-7 sm:p-8 text-center border border-azul-200/60 card-hover"
+              className="group relative brutal-card bg-white p-7 sm:p-8 text-center"
               style={{ transitionDelay: `${i * 120}ms` }}
             >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stepBgColors[i]} flex items-center justify-center text-white shadow-lg mx-auto mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>
+              <div className={`w-14 h-14 ${stepBgColors[i]} flex items-center justify-center brutal-border-2 mx-auto mb-5`}>
                 <StepIcon icon={step.icon} />
               </div>
-              <h3 className="font-display font-bold text-xl text-warm-950 mb-3 group-hover:text-azul-800 transition-colors duration-300">
-                <span className="text-azul-400 font-mono text-sm mr-2">0{i + 1}</span>
+              <h3 className="font-display font-bold text-xl text-ink mb-3 uppercase">
+                <span className="text-accent-2 font-mono text-sm mr-2">0{i + 1}</span>
                 {step.title}
               </h3>
-              <p className="text-sm text-warm-500 leading-relaxed">{step.desc}</p>
+              <p className="text-sm text-ink/70 leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>

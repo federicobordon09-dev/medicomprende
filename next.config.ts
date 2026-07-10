@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   async headers() {
+    // La CSP estricta (sin 'unsafe-eval') rompe el modo dev de Next.js,
+    // que necesita eval para el runtime de React Fast Refresh. Solo se
+    // aplica en producción; en desarrollo se omite para que hidrate bien.
+    if (process.env.NODE_ENV !== "production") {
+      return [];
+    }
     return [
       {
         source: "/(.*)",

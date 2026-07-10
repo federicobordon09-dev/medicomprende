@@ -71,32 +71,33 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-azul-900 rounded-xl flex items-center justify-center text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 w-11 h-11 bg-ink brutal-border-2 flex items-center justify-center text-paper"
         aria-label="Abrir menú"
         style={{ display: mobileOpen ? "none" : undefined }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
         </svg>
       </button>
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-azul-950 text-white flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-        <div className="flex items-center justify-between p-5 border-b border-white/10">
+      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-ink text-paper flex flex-col transition-transform duration-300 border-r-[3px] border-ink ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+        <div className="flex items-center justify-between p-4 border-b-[3px] border-paper/20">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="font-display font-semibold text-lg">MediComprende</span>
+            <span className="font-display font-bold text-lg uppercase tracking-tight text-paper">Medi</span>
+            <span className="font-display font-bold text-lg uppercase tracking-tight bg-accent text-ink px-1">Comp</span>
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white flex-shrink-0"
+            className="lg:hidden w-8 h-8 bg-paper/10 hover:bg-paper/20 flex items-center justify-center text-paper flex-shrink-0 brutal-border-2"
             aria-label="Cerrar menú"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-2">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (pathname.startsWith(item.href + "/") && item.href !== "/dashboard");
             return (
@@ -104,13 +105,12 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`relative flex items-center gap-3 px-3 py-2.5 text-sm font-mono font-bold uppercase tracking-tight transition-all brutal-border-2 ${
                   isActive
-                    ? "bg-cta-500/20 text-cta-300"
-                    : "text-white/60 hover:text-white hover:bg-white/10 nav-hover-lift"
+                    ? "bg-accent text-ink"
+                    : "bg-transparent text-paper/70 hover:text-ink hover:bg-accent"
                 }`}
               >
-                {isActive && <span className="sidebar-indicator active absolute -left-3 top-1/2 -translate-y-1/2" />}
                 {ICONS[item.icon]}
                 {item.label}
               </Link>
@@ -118,20 +118,20 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t-[3px] border-paper/20">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-cta-500 flex items-center justify-center text-xs font-bold">
+            <div className="w-9 h-9 bg-accent text-ink brutal-border-2 flex items-center justify-center text-xs font-bold">
               {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{session?.user?.name || "Usuario"}</p>
-              <p className="text-xs text-white/50 truncate">{session?.user?.email}</p>
+              <p className="text-sm font-bold truncate text-paper">{session?.user?.name || "Usuario"}</p>
+              <p className="text-xs text-paper/50 truncate">{session?.user?.email}</p>
             </div>
             {plan && (
               plan === "pro" ? (
-                <span className="text-[10px] font-bold bg-cta-500 text-white px-2 py-0.5 rounded-full">PRO</span>
+                <span className="text-[10px] font-bold bg-accent text-ink px-2 py-1 brutal-border-2">PRO</span>
               ) : (
-                <Link href="/pricing" className="text-[10px] font-bold bg-white/10 hover:bg-white/20 text-white/80 hover:text-white px-2 py-0.5 rounded-full transition-colors">
+                <Link href="/pricing" className="text-[10px] font-bold bg-paper/10 text-paper hover:bg-accent hover:text-ink px-2 py-1 brutal-border-2 transition-colors">
                   GRATIS
                 </Link>
               )
@@ -139,16 +139,16 @@ export function Sidebar() {
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm font-mono font-bold uppercase text-paper/70 hover:text-ink hover:bg-accent brutal-border-2 transition-all"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
-            Cerrar sesión
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+            Salir
           </button>
         </div>
       </aside>
 
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 bg-ink/60 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
     </>
   );

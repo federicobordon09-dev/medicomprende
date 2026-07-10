@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Figtree, Noto_Sans } from "next/font/google";
+import { Space_Mono, Archivo } from "next/font/google";
 import "./globals.css";
 import "aos/dist/aos.css";
 import { SessionProvider } from "next-auth/react";
@@ -7,13 +7,14 @@ import { QueryProvider } from "@/lib/query-provider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { site } from "@/data/contenido";
 
-const figtree = Figtree({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
-const notoSans = Noto_Sans({
+const archivo = Archivo({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
@@ -74,8 +75,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${figtree.variable} ${notoSans.variable}`}>
-      <body className="font-body text-warm-950 bg-sk-50 antialiased">
+    <html lang="es" className={`${spaceMono.variable} ${archivo.variable}`}>
+      <body className="font-body text-ink bg-paper antialiased">
         <SessionProvider>
           <QueryProvider>
             <ErrorBoundary>

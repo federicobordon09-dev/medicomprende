@@ -9,11 +9,11 @@ export default function Preguntas() {
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <section id="faq" className="py-20 md:py-28 px-4 sm:px-6 bg-gradient-to-b from-azul-50 to-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--color-azul-100)_0%,_transparent_60%)] pointer-events-none" />
+    <section id="faq" className="py-20 md:py-28 px-4 sm:px-6 bg-paper border-t-[3px] border-ink relative overflow-hidden">
       <div className="max-w-2xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h2 className="font-display font-extrabold text-[clamp(1.8rem,4vw,3rem)] text-warm-950">Preguntas frecuentes</h2>
+          <span className="brutal-tag mb-4">FAQ</span>
+          <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] text-ink uppercase mt-4">Preguntas frecuentes</h2>
         </div>
         <div className="space-y-3">
           {preguntas.map((faq, i) => {
@@ -23,13 +23,11 @@ export default function Preguntas() {
             return (
               <div
                 key={i}
-                className={`bg-white border-2 rounded-xl overflow-hidden transition-all duration-300 ${
-                  isOpen ? "border-azul-400 shadow-lg shadow-azul-200/30" : "border-warm-200 hover:border-azul-300 hover:shadow-md"
-                }`}
+                className={`brutal-card overflow-hidden transition-all duration-300 ${isOpen ? "bg-accent" : "bg-white"}`}
               >
                 <button
                   id={buttonId}
-                  className="w-full flex items-center justify-between px-5 sm:px-6 py-4 sm:py-5 font-semibold text-sm sm:text-base text-warm-950 text-left gap-3 hover:bg-azul-50/50 transition-colors min-h-[52px]"
+                  className="w-full flex items-center justify-between px-5 sm:px-6 py-4 sm:py-5 font-bold text-sm sm:text-base text-ink text-left gap-3 hover:bg-ink hover:text-paper transition-colors min-h-[52px] font-mono uppercase"
                   onClick={() => toggle(i)}
                   aria-expanded={isOpen}
                   aria-controls={panelId}
@@ -44,7 +42,7 @@ export default function Preguntas() {
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className={`text-azul-500 flex-shrink-0 transition-transform duration-300 sm:w-[18px] sm:h-[18px] ${isOpen ? "rotate-180 text-azul-700" : ""}`}
+                    className={`flex-shrink-0 transition-transform duration-300 sm:w-[18px] sm:h-[18px] ${isOpen ? "rotate-180" : ""}`}
                     aria-hidden="true"
                   >
                     <polyline points="6 9 12 15 18 9" />
@@ -57,8 +55,8 @@ export default function Preguntas() {
                   className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? "max-h-[500px]" : "max-h-0"}`}
                 >
                   <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
-                    <div className="w-10 h-0.5 bg-azul-200 rounded-full mb-4" />
-                    <p className="text-sm sm:text-base text-warm-600 leading-relaxed">{faq.respuesta}</p>
+                    <div className="w-10 h-1 bg-ink mb-4" />
+                    <p className="text-sm sm:text-base text-ink leading-relaxed">{faq.respuesta}</p>
                   </div>
                 </div>
               </div>
